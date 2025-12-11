@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ucop.edu.controller.AdminUserController"
+      spacing="20" style="-fx-padding: 20; -fx-background-color: #f8f9fa;">
+
+    <Label text="QUẢN LÝ NGƯỜI DÙNG" style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
+
+    <HBox spacing="10">
+        <Button text="Thêm người dùng" onAction="#openAddUser"/>
+        <Button text="Làm mới" onAction="#loadUsers"/>
+    </HBox>
+
+    <TableView fx:id="userTable">
+        <columns>
+            <TableColumn text="ID" prefWidth="60">
+                <cellValueFactory><PropertyValueFactory property="id"/></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Username" prefWidth="150">
+                <cellValueFactory><PropertyValueFactory property="username"/></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Họ tên" prefWidth="200">
+                <cellValueFactory><PropertyValueFactory property="fullName"/></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Vai trò" prefWidth="100">
+                <cellValueFactory><PropertyValueFactory property="role"/></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Trạng thái" prefWidth="120">
+                <cellValueFactory><PropertyValueFactory property="status"/></cellValueFactory>
+            </TableColumn>
+            <TableColumn text="Hành động" prefWidth="200">
+                <cellFactory>
+                    <Callback>
+                        <fx:constant name="value" value="com.ucop.edu.controller.AdminUserController$ActionCell"/>
+                    </Callback>
+                </cellFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+</VBox>

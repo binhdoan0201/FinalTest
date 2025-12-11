@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ucop.edu.controller.AdminDashboardController"
+      spacing="20" style="-fx-padding: 30; -fx-background-color: #e9ecef;">
+
+    <Label fx:id="lblWelcome" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+    <Label text="CHỨC NĂNG ADMIN" style="-fx-font-size: 20px; -fx-text-fill: #495057;"/>
+
+    <HBox spacing="20">
+        <Button text="Quản lý người dùng" onAction="#openUserManagement" 
+                style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 16px;" 
+                prefWidth="250" prefHeight="80"/>
+        <Button text="Quản lý khóa học" style="-fx-background-color: #28a745; -fx-text-fill: white;" 
+                prefWidth="250" prefHeight="80"/>
+        <Button text="Báo cáo doanh thu" style="-fx-background-color: #ffc107; -fx-text-fill: black;" 
+                prefWidth="250" prefHeight="80"/>
+    </HBox>
+
+    <Button text="Đăng xuất" onAction="#logout" 
+            style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
+</VBox>
