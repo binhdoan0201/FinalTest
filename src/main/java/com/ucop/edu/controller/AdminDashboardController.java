@@ -1,5 +1,7 @@
 package com.ucop.edu.controller;
 
+import com.ucop.edu.entity.Account;
+import com.ucop.edu.util.CurrentUser;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,7 +15,18 @@ public class AdminDashboardController {
 
     @FXML
     private void initialize() {
-        lblWelcome.setText("CHÀO MỪNG ADMIN!");
+        Account acc = CurrentUser.getCurrentAccount();
+        String name = "ADMIN";
+
+        if (acc != null) {
+            if (acc.getProfile() != null && acc.getProfile().getFullName() != null && !acc.getProfile().getFullName().trim().isEmpty()) {
+                name = acc.getProfile().getFullName();
+            } else {
+                name = acc.getUsername(); // dùng username nếu chưa có họ tên
+            }
+        }
+
+        lblWelcome.setText("CHÀO MỪNG " + name.toUpperCase() + "!");
     }
 
     @FXML
@@ -23,6 +36,7 @@ public class AdminDashboardController {
 
     @FXML
     private void logout() throws Exception {
+        CurrentUser.clear();
         loadScene("/fxml/login.fxml");
     }
 
@@ -30,5 +44,7 @@ public class AdminDashboardController {
         Parent root = FXMLLoader.load(getClass().getResource(fxml));
         Stage stage = (Stage) lblWelcome.getScene().getWindow();
         stage.setScene(new Scene(root));
+        stage.setTitle("UCOP - Universal Commerce & Operations Platform");
+        stage.centerOnScreen();
     }
 }

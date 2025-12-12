@@ -16,13 +16,14 @@ public class Account {
 
     private String role;
 
-    private boolean enabled = true;
+    @Column(nullable = true)
+    private Boolean enabled = true;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
     private AccountProfile profile;
 
-    // Getter & Setter thủ công
+    // Getter & Setter
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -35,8 +36,8 @@ public class Account {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    public boolean isEnabled() { return enabled; }
-    public void setEnabled(boolean enabled) { this.enabled = enabled; }
+    public boolean isEnabled() { return enabled != null && enabled; }
+    public void setEnabled(Boolean enabled) { this.enabled = enabled; }
 
     public AccountProfile getProfile() { return profile; }
     public void setProfile(AccountProfile profile) { this.profile = profile; }

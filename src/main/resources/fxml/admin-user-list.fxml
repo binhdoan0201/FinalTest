@@ -4,39 +4,28 @@
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.ucop.edu.controller.AdminUserController"
-      spacing="20" style="-fx-padding: 20; -fx-background-color: #f8f9fa;">
+      spacing="20" style="-fx-padding: 25; -fx-background-color: #f8f9fa;">
 
-    <Label text="QUẢN LÝ NGƯỜI DÙNG" style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
-
-    <HBox spacing="10">
-        <Button text="Thêm người dùng" onAction="#openAddUser"/>
-        <Button text="Làm mới" onAction="#loadUsers"/>
+    <!-- NÚT QUAY LẠI + TIÊU ĐỀ + NÚT THÊM + LÀM MỚI -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Button text="Quay lại" onAction="#backToDashboard"
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        <Label text="QUẢN LÝ NGƯỜI DÙNG" 
+               style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        <Button text="Thêm người dùng" onAction="#openAddUser"
+                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 16px;"/>
+        <Button text="Làm mới" onAction="#refreshTable"
+                style="-fx-background-color: #007bff; -fx-text-fill: white;"/>
     </HBox>
 
-    <TableView fx:id="userTable">
+    <TableView fx:id="userTable" prefHeight="700">
         <columns>
-            <TableColumn text="ID" prefWidth="60">
-                <cellValueFactory><PropertyValueFactory property="id"/></cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Username" prefWidth="150">
-                <cellValueFactory><PropertyValueFactory property="username"/></cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Họ tên" prefWidth="200">
-                <cellValueFactory><PropertyValueFactory property="fullName"/></cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Vai trò" prefWidth="100">
-                <cellValueFactory><PropertyValueFactory property="role"/></cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Trạng thái" prefWidth="120">
-                <cellValueFactory><PropertyValueFactory property="status"/></cellValueFactory>
-            </TableColumn>
-            <TableColumn text="Hành động" prefWidth="200">
-                <cellFactory>
-                    <Callback>
-                        <fx:constant name="value" value="com.ucop.edu.controller.AdminUserController$ActionCell"/>
-                    </Callback>
-                </cellFactory>
-            </TableColumn>
+            <TableColumn fx:id="colId" text="ID" prefWidth="80"/>
+            <TableColumn fx:id="colUsername" text="Tên đăng nhập" prefWidth="180"/>
+            <TableColumn fx:id="colFullName" text="Họ tên" prefWidth="220"/>
+            <TableColumn fx:id="colRole" text="Vai trò" prefWidth="120"/>
+            <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120"/>
+            <TableColumn fx:id="colAction" text="Hành động" prefWidth="420"/>
         </columns>
     </TableView>
 </VBox>

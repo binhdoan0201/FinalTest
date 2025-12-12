@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.ucop.edu.controller.LoginController"
-      alignment="CENTER" spacing="20" style="-fx-background-color: #f4f4f4;">
+      alignment="CENTER" spacing="25" style="-fx-background-color: linear-gradient(to bottom, #667eea, #764ba2);"
+      prefWidth="500" prefHeight="600">
 
-    <Label text="UCOP EDUCATION" style="-fx-font-size: 30px; -fx-font-weight: bold;"/>
-    <TextField fx:id="usernameField" promptText="Tên đăng nhập"/>
-    <PasswordField fx:id="passwordField" promptText="Mật khẩu"/>
-    <Button text="Đăng nhập" onAction="#handleLogin"/>
-    <Label fx:id="errorLabel" style="-fx-text-fill: red;"/>
+    <padding>
+        <Insets top="50" right="50" bottom="50" left="50"/>
+    </padding>
+
+    <Label text="UCOP EDUCATION"
+           style="-fx-font-size: 40px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+
+    <VBox spacing="20" alignment="CENTER" maxWidth="400">
+        <TextField fx:id="usernameField" promptText="Tên đăng nhập"
+                   prefHeight="50" style="-fx-background-radius: 25; -fx-padding: 0 20 0 20; -fx-font-size: 15px;"/>
+        <PasswordField fx:id="passwordField" promptText="Mật khẩu"
+                       prefHeight="50" style="-fx-background-radius: 25; -fx-padding: 0 20 0 20; -fx-font-size: 15px;"/>
+        <Button text="ĐĂNG NHẬP" onAction="#handleLogin"
+                prefWidth="400" prefHeight="55"
+                style="-fx-background-color: #ffffff; -fx-text-fill: #667eea; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 30; -fx-cursor: hand;"/>
+        <Label fx:id="errorLabel" style="-fx-text-fill: #ff6b6b; -fx-font-size: 14px;"/>
+    </VBox>
+
+    <Label text="© 2025 UCOP Education System" style="-fx-text-fill: rgba(255,255,255,0.7);"/>
 </VBox>

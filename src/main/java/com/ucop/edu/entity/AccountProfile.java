@@ -8,7 +8,7 @@ public class AccountProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(name = "full_name")  // THÊM DÒNG NÀY!!!
     private String fullName;
     private String email;
     private String phone;
