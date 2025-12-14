@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ucop.edu.controller.CategoryManagementController"
+            style="-fx-background-color: #f3f6fb;">
+
+    <!-- HEADER -->
+    <top>
+        <HBox spacing="12"
+              style="-fx-background-color: linear-gradient(to right, #2563eb, #1d4ed8);
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 14, 0, 0, 3);">
+            <padding>
+                <Insets top="14" right="16" bottom="14" left="16"/>
+            </padding>
+
+            <Label text="QUẢN LÝ DANH MỤC"
+                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="⬅ Quay lại"
+                    onAction="#backToDashboard"
+                    style="-fx-background-color: rgba(255,255,255,0.18);
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-background-radius: 10;
+                           -fx-padding: 8 14;
+                           -fx-cursor: hand;"/>
+        </HBox>
+    </top>
+
+    <!-- BODY -->
+    <center>
+        <SplitPane dividerPositions="0.55" style="-fx-background-color: transparent;">
+
+            <!-- LEFT: TABLE CARD -->
+            <VBox spacing="10"
+                  style="-fx-background-color: white;
+                         -fx-background-radius: 14;
+                         -fx-border-radius: 14;
+                         -fx-border-color: #e5e7eb;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 16, 0, 0, 4);">
+                <padding>
+                    <Insets top="16" right="16" bottom="16" left="16"/>
+                </padding>
+
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="📋 Danh sách danh mục"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="(Click 1 dòng để sửa)"
+                           style="-fx-text-fill: #6b7280;"/>
+                </HBox>
+
+                <TableView fx:id="tblCategories" prefHeight="520"
+                           style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;">
+                    <columns>
+                        <TableColumn fx:id="colId" text="Mã" prefWidth="80"/>
+                        <TableColumn fx:id="colName" text="Tên danh mục" prefWidth="240"/>
+                        <TableColumn fx:id="colParent" text="Danh mục cha" prefWidth="240"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- RIGHT: FORM CARD -->
+            <VBox spacing="12"
+                  style="-fx-background-color: white;
+                         -fx-background-radius: 14;
+                         -fx-border-radius: 14;
+                         -fx-border-color: #e5e7eb;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 16, 0, 0, 4);">
+                <padding>
+                    <Insets top="16" right="16" bottom="16" left="16"/>
+                </padding>
+
+                <Label text="🧾 Thông tin danh mục"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+
+                <GridPane hgap="10" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="110"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+
+                    <Label text="Mã danh mục:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtId" editable="false" promptText="Tự động"
+                               GridPane.rowIndex="0" GridPane.columnIndex="1"
+                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Label text="Tên danh mục:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtName" promptText="Nhập tên danh mục..."
+                               GridPane.rowIndex="1" GridPane.columnIndex="1"
+                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Label text="Danh mục cha:" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cbParent" promptText="(Không có) / Chọn danh mục cha"
+                              GridPane.rowIndex="2" GridPane.columnIndex="1"
+                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                </GridPane>
+
+                <!-- BUTTONS -->
+                <HBox spacing="10">
+                    <Button text="➕ Thêm"
+                            onAction="#handleAdd"
+                            style="-fx-background-color: #22c55e;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 9 14;
+                                   -fx-cursor: hand;"/>
+
+                    <Button text="✏️ Sửa"
+                            onAction="#handleUpdate"
+                            style="-fx-background-color: #f59e0b;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 9 14;
+                                   -fx-cursor: hand;"/>
+
+                    <Button text="🗑 Xóa"
+                            onAction="#handleDelete"
+                            style="-fx-background-color: #ef4444;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 9 14;
+                                   -fx-cursor: hand;"/>
+
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <Button text="🔄 Làm mới"
+                            onAction="#handleClear"
+                            style="-fx-background-color: #e5e7eb;
+                                   -fx-text-fill: #111827;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 9 14;
+                                   -fx-cursor: hand;"/>
+                </HBox>
+
+                <Label fx:id="lblMsg" wrapText="true"
+                       style="-fx-text-fill: #2563eb; -fx-font-weight: bold;"/>
+
+                <Label text="💡 Gợi ý: Không chọn “Danh mục cha” là chính nó hoặc con của nó."
+                       wrapText="true"
+                       style="-fx-text-fill: #6b7280;"/>
+            </VBox>
+
+        </SplitPane>
+    </center>
+
+    <padding>
+        <Insets top="12" right="12" bottom="12" left="12"/>
+    </padding>
+
+</BorderPane>

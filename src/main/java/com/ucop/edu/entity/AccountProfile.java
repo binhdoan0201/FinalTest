@@ -13,7 +13,10 @@ public class AccountProfile {
     private String email;
     private String phone;
     private String address;
-
+    @OneToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
+    
     // Getter & Setter
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

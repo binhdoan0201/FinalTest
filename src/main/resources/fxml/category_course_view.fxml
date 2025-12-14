@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ucop.edu.controller.CategoryCourseViewController"
+            style="-fx-background-color: linear-gradient(to bottom right, #0f172a, #111827);">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE" style="-fx-background-color: transparent;">
+            <tabs>
+
+                <Tab fx:id="tabCategory" text="📁 Quản lý danh mục">
+                    <content>
+                        <!-- fx:id để controller cha lấy được controller con -->
+                        <fx:include fx:id="categoryView" source="category_management.fxml"/>
+                    </content>
+                </Tab>
+
+                <Tab fx:id="tabCourse" text="📚 Quản lý khóa học"
+                     onSelectionChanged="#onCourseTabSelected">
+                    <content>
+                        <!-- fx:id để controller cha lấy được controller con -->
+                        <fx:include fx:id="courseView" source="course_management.fxml"/>
+                    </content>
+                </Tab>
+
+            </tabs>
+        </TabPane>
+    </center>
+
+</BorderPane>

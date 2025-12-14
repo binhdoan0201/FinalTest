@@ -6,10 +6,10 @@
     <session-factory>
         <property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
         <property name="hibernate.connection.url">
-            jdbc:sqlserver://DESKTOP-EDP0165\SQLEXPRESS:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true;instance=SQLEXPRESS
+            jdbc:sqlserver://MSI\SQLEXPRESS:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true;instance=SQLEXPRESS
         </property>
         <property name="hibernate.connection.username">sa</property>
-        <property name="hibernate.connection.password">123456</property>
+        <property name="hibernate.connection.password">123</property>
         
         <property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
@@ -19,8 +19,33 @@
         <!-- Entity mapping -->
         <mapping class="com.ucop.edu.entity.Account"/>
         <mapping class="com.ucop.edu.entity.AccountProfile"/>
-        <mapping class="com.ucop.edu.entity.Course"/>
         <mapping class="com.ucop.edu.entity.AuditLog"/>
-        <!-- Thêm các entity khác sau -->
+
+        <!-- SV2: Category + Course -->
+        <mapping class="com.ucop.edu.entity.Categories"/>
+        <mapping class="com.ucop.edu.entity.Course"/>
+
+        <!-- Cart -->
+        <mapping class="com.ucop.edu.entity.Cart"/>
+        <mapping class="com.ucop.edu.entity.CartItem"/>
+
+        <!-- Enrollment -->
+        <mapping class="com.ucop.edu.entity.Enrollment"/>
+        <mapping class="com.ucop.edu.entity.EnrollmentItem"/>
+
+        <!-- Appointment -->
+        <mapping class="com.ucop.edu.entity.Appointment"/>
+
+        <!-- Payment / Refund -->
+        <mapping class="com.ucop.edu.entity.Payment"/>
+        <mapping class="com.ucop.edu.entity.Refund"/>
+
+        <!-- Promotion -->
+        <mapping class="com.ucop.edu.entity.Promotion"/>
+        <mapping class="com.ucop.edu.entity.PromotionUsage"/>
+
+        <!-- Stock / Wallet -->
+        <mapping class="com.ucop.edu.entity.SeatStock"/>
+        <mapping class="com.ucop.edu.entity.Wallets"/>
     </session-factory>
 </hibernate-configuration>

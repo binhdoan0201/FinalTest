@@ -33,7 +33,17 @@ public class AdminDashboardController {
     private void openUserManagement() throws Exception {
         loadScene("/fxml/admin-user-list.fxml");
     }
-
+    
+    @FXML
+    private void openCourseManagement() throws Exception {
+    	Parent root = FXMLLoader.load(getClass().getResource("/fxml/category_course_view.fxml"));
+        Stage stage = (Stage) lblWelcome.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.setTitle("UCOP - Universal Commerce & Operations Platform");
+        stage.centerOnScreen();
+        stage.setMaximized(true); 
+    }
+    
     @FXML
     private void logout() throws Exception {
         CurrentUser.clear();

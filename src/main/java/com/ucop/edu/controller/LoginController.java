@@ -48,7 +48,10 @@ public class LoginController {
                 if ("ADMIN".equalsIgnoreCase(account.getRole())) {
                     loadScene("/fxml/admin-dashboard.fxml");
                 } else if ("STAFF".equalsIgnoreCase(account.getRole())) {
-                    loadScene("/fxml/staff-dashboard.fxml"); // bạn sẽ làm sau
+                	Parent root = FXMLLoader.load(getClass().getResource("/fxml/staff-dashboard.fxml"));
+                    Stage stage = (Stage) usernameField.getScene().getWindow();
+                    stage.setScene(new Scene(root));
+                    stage.setTitle("UCOP Education - " + CurrentUser.getCurrentAccount().getRole());
                 } else {
                     loadScene("/fxml/student-dashboard.fxml");
                 }

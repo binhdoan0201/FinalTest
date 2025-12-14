@@ -18,9 +18,8 @@ public class Account {
 
     @Column(nullable = true)
     private Boolean enabled = true;
-
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "profile_id")
+    
+    @OneToOne(mappedBy = "account")
     private AccountProfile profile;
 
     // Getter & Setter
