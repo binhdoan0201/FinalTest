@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ucop.edu.controller.StudentDashboardController"
+            prefWidth="1200" prefHeight="800">
+
+    <!-- TOP BAR -->
+    <top>
+        <HBox spacing="12" style="-fx-background-color: #0f172a;">
+            <padding>
+                <Insets top="18" right="18" bottom="18" left="18"/>
+            </padding>
+
+            <VBox spacing="2">
+                <Label text="UCOP Education" style="-fx-text-fill: white;">
+                    <font><Font size="18"/></font>
+                </Label>
+                <Label fx:id="welcomeLabel" text="Xin chào, Student"
+                       style="-fx-text-fill: #cbd5e1;"/>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="Đăng xuất" onAction="#handleLogout"
+                    style="-fx-background-color: transparent; -fx-border-color: #94a3b8; -fx-text-fill: white; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8 14;"/>
+        </HBox>
+    </top>
+
+    <!-- LEFT MENU -->
+    <left>
+        <VBox spacing="10" prefWidth="220"
+              style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-width: 0 1 0 0;">
+            <padding>
+                <Insets top="16" right="16" bottom="16" left="16"/>
+            </padding>
+
+            <Label text="Menu" style="-fx-text-fill: #0f172a;">
+                <font><Font size="14"/></font>
+            </Label>
+
+            <Button text="📚 Danh sách khóa học" onAction="#showCourses"
+                    style="-fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 10 12;"/>
+
+            <Button text="🛒 Giỏ hàng" onAction="#showCart"
+                    style="-fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 10 12;"/>
+
+            <Button text="🧾 Đơn hàng của tôi" onAction="#showOrders"
+                    style="-fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 10 12;"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Label text="Tip: Chọn khóa học rồi bấm 'Thêm vào giỏ'."
+                   style="-fx-text-fill: #64748b;"/>
+        </VBox>
+    </left>
+
+    <!-- CENTER CONTENT -->
+    <center>
+        <VBox spacing="14" style="-fx-background-color: white;">
+            <padding>
+                <Insets top="18" right="18" bottom="18" left="18"/>
+            </padding>
+
+            <Label text="Khóa học nổi bật" style="-fx-text-fill: #0f172a;">
+                <font><Font size="18"/></font>
+            </Label>
+
+            <!-- Courses table -->
+            <TableView fx:id="courseTable" prefHeight="430"
+                       style="-fx-border-color: #e2e8f0; -fx-border-radius: 10; -fx-background-radius: 10;">
+                <columns>
+                    <TableColumn fx:id="colCourseId" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="colCourseName" text="Tên khóa học" prefWidth="520"/>
+                    <TableColumn fx:id="colCourseFee" text="Học phí" prefWidth="140"/>
+                    <TableColumn fx:id="colCourseStatus" text="Trạng thái" prefWidth="120"/>
+                </columns>
+            </TableView>
+
+            <!-- Bottom bar -->
+            <HBox spacing="12"
+                  style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-background-radius: 12;">
+                <padding>
+                    <Insets top="14" right="14" bottom="14" left="14"/>
+                </padding>
+
+                <Label text="Giỏ hàng:" style="-fx-text-fill: #0f172a;">
+                    <font><Font size="14"/></font>
+                </Label>
+
+                <Label text="Số lượng:" style="-fx-text-fill: #334155;"/>
+                <Label fx:id="cartCountLabel" text="0" style="-fx-text-fill: #0f172a; -fx-font-weight: bold;"/>
+
+                <Label text="Tổng tiền:" style="-fx-text-fill: #334155;"/>
+                <Label fx:id="cartTotalLabel" text="0 VNĐ"
+                       style="-fx-text-fill: #16a34a; -fx-font-weight: bold;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="Xem giỏ hàng" onAction="#showCart"
+                        style="-fx-background-color: white; -fx-border-color: #94a3b8; -fx-text-fill: #0f172a; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 10 14;"/>
+
+                <Button text="Checkout" onAction="#checkout"
+                        style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 10 16;"/>
+            </HBox>
+        </VBox>
+    </center>
+
+</BorderPane>

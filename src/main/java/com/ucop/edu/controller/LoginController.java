@@ -28,7 +28,9 @@ public class LoginController {
         }
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Account account = session.createQuery("FROM Account WHERE username = :u", Account.class)
+
+            Account account = session.createQuery(
+                    "FROM Account WHERE username = :u", Account.class)
                     .setParameter("u", username)
                     .uniqueResult();
 
@@ -37,37 +39,55 @@ public class LoginController {
                 return;
             }
 
-            // Tạm thời cho phép đăng nhập bằng mật khẩu gốc (chưa hash) để test
-            // Sau này bạn thay bằng BCrypt.checkpw(password, account.getPassword())
-            if (password.equals(account.getPassword())) {
-                errorLabel.setText("");
-
-                // Lưu user hiện tại (có thể dùng static hoặc Preference)
-                CurrentUser.setCurrentAccount(account);
-
-                if ("ADMIN".equalsIgnoreCase(account.getRole())) {
-                    loadScene("/fxml/admin-dashboard.fxml");
-                } else if ("STAFF".equalsIgnoreCase(account.getRole())) {
-                	Parent root = FXMLLoader.load(getClass().getResource("/fxml/staff-dashboard.fxml"));
-                    Stage stage = (Stage) usernameField.getScene().getWindow();
-                    stage.setScene(new Scene(root));
-                    stage.setTitle("UCOP Education - " + CurrentUser.getCurrentAccount().getRole());
-                } else {
-                    loadScene("/fxml/student-dashboard.fxml");
-                }
-            } else {
+            // Tạm thời so sánh plain text để test
+            if (!password.equals(account.getPassword())) {
                 errorLabel.setText("Sai mật khẩu!");
+                return;
             }
+
+            // Login OK
+            CurrentUser.setCurrentAccount(account);
+            errorLabel.setText("");
+
+            String role = account.getRole() == null ? "" : account.getRole().toUpperCase();
+
+            switch (role) {
+                case "ADMIN":
+                    loadScene("admin-dashboard.fxml");
+                    break;
+                case "STAFF":
+                    loadScene("staff-dashboard.fxml");
+                    break;
+                default:
+                    // STUDENT -> chuyển qua student-dashboard.fxml
+                    loadScene("student-dashboard.fxml");
+                    break;
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
-            errorLabel.setText("Lỗi kết nối CSDL!");
+            errorLabel.setText("Lỗi hệ thống!");
         }
     }
 
-    private void loadScene(String fxml) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource(fxml));
-        Stage stage = (Stage) usernameField.getScene().getWindow();
-        stage.setScene(new Scene(root, 1200, 800));
-        stage.setTitle("UCOP Education - " + CurrentUser.getCurrentAccount().getRole());
+    private void loadScene(String fxmlFile) {
+        try {
+            String path = "/fxml/" + fxmlFile;
+
+            var url = getClass().getResource(path);
+            if (url == null) {
+                throw new RuntimeException("Không tìm thấy FXML: " + path);
+            }
+
+            Parent root = FXMLLoader.load(url);
+
+            Stage stage = (Stage) usernameField.getScene().getWindow();
+            stage.setScene(new Scene(root, 1200, 800));
+            stage.setTitle("UCOP Education - " + CurrentUser.getCurrentAccount().getRole());
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

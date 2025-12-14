@@ -4,30 +4,46 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-        <property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
-        <property name="hibernate.connection.url">
-            jdbc:sqlserver://MSI\SQLEXPRESS:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true;instance=SQLEXPRESS
+
+        <!-- Database connection -->
+        <property name="hibernate.connection.driver_class">
+            com.microsoft.sqlserver.jdbc.SQLServerDriver
         </property>
+
+        <property name="hibernate.connection.url">
+  		jdbc:sqlserver://TJR\SQLEXPRESS:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true
+        </property>
+
+
         <property name="hibernate.connection.username">sa</property>
-        <property name="hibernate.connection.password">123</property>
-        
-        <property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
+        <property name="hibernate.connection.password">123456</property>
+
+        <!-- Hibernate config -->
+        <property name="hibernate.dialect">
+            org.hibernate.dialect.SQLServerDialect
+        </property>
         <property name="hibernate.hbm2ddl.auto">update</property>
         <property name="show_sql">true</property>
         <property name="format_sql">true</property>
 
-        <!-- Entity mapping -->
+        <!-- ================= ENTITY MAPPING ================= -->
+
+        <!-- Account -->
         <mapping class="com.ucop.edu.entity.Account"/>
         <mapping class="com.ucop.edu.entity.AccountProfile"/>
         <mapping class="com.ucop.edu.entity.AuditLog"/>
 
-        <!-- SV2: Category + Course -->
+        <!-- Category + Course -->
         <mapping class="com.ucop.edu.entity.Categories"/>
         <mapping class="com.ucop.edu.entity.Course"/>
 
         <!-- Cart -->
         <mapping class="com.ucop.edu.entity.Cart"/>
         <mapping class="com.ucop.edu.entity.CartItem"/>
+
+        <!-- Order -->
+        <mapping class="com.ucop.edu.entity.Order"/>
+        <mapping class="com.ucop.edu.entity.OrderItem"/>
 
         <!-- Enrollment -->
         <mapping class="com.ucop.edu.entity.Enrollment"/>
@@ -47,5 +63,6 @@
         <!-- Stock / Wallet -->
         <mapping class="com.ucop.edu.entity.SeatStock"/>
         <mapping class="com.ucop.edu.entity.Wallets"/>
+
     </session-factory>
 </hibernate-configuration>
