@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<<<<<<< HEAD
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -112,3 +113,14 @@
     </center>
 
 </BorderPane>
+=======
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Pane?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label alignment="CENTER" layoutX="191.0" layoutY="131.0" prefHeight="103.0" prefWidth="218.0" text="Student dashboard" />
+   </children>
+</Pane>
+>>>>>>> ae0dc48205a25f8d5ddf7b2717408e1f51ffaac2
