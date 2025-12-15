@@ -1,294 +1,186 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/25"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.ucop.edu.controller.CourseManagementController"
-            style="-fx-background-color: #f3f6fb;">
+<BorderPane prefHeight="279.0" prefWidth="1626.0" style="-fx-background-color: #f3f6fb;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ucop.edu.controller.CourseManagementController">
 
     <!-- HEADER -->
     <top>
-        <HBox spacing="12"
-              style="-fx-background-color: linear-gradient(to right, #2563eb, #1d4ed8);
-                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 14, 0, 0, 3);">
+        <HBox spacing="12" style="-fx-background-color: linear-gradient(to right, #2563eb, #1d4ed8);                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 14, 0, 0, 3);">
             <padding>
-                <Insets top="14" right="16" bottom="14" left="16"/>
+                <Insets bottom="14" left="16" right="16" top="14" />
             </padding>
 
-            <Label text="QUẢN LÝ KHÓA HỌC"
-                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+            <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="QUẢN LÝ KHÓA HỌC" />
 
-            <Region HBox.hgrow="ALWAYS"/>
+            <Region HBox.hgrow="ALWAYS" />
 
-            <Button text="⬅ Quay lại"
-                    onAction="#backToDashboard"
-                    style="-fx-background-color: rgba(255,255,255,0.18);
-                           -fx-text-fill: white;
-                           -fx-font-weight: bold;
-                           -fx-background-radius: 10;
-                           -fx-padding: 8 14;
-                           -fx-cursor: hand;"/>
+            <Button onAction="#backToDashboard" style="-fx-background-color: rgba(255,255,255,0.18);                            -fx-text-fill: white;                            -fx-font-weight: bold;                            -fx-background-radius: 10;                            -fx-padding: 8 14;                            -fx-cursor: hand;" text="⬅ Quay lại" />
         </HBox>
     </top>
 
     <!-- BODY -->
     <center>
-        <SplitPane dividerPositions="0.62" style="-fx-background-color: transparent;">
+        <SplitPane dividerPositions="0.6591614906832298" prefHeight="685.0" prefWidth="1400.0" style="-fx-background-color: transparent;">
 
             <!-- LEFT: TABLE + FILTER CARD -->
-            <VBox spacing="12"
-                  style="-fx-background-color: white;
-                         -fx-background-radius: 14;
-                         -fx-border-radius: 14;
-                         -fx-border-color: #e5e7eb;
-                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 16, 0, 0, 4);">
+            <VBox prefHeight="683.0" prefWidth="699.0" spacing="12" style="-fx-background-color: white;                          -fx-background-radius: 14;                          -fx-border-radius: 14;                          -fx-border-color: #e5e7eb;                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 16, 0, 0, 4);">
                 <padding>
-                    <Insets top="16" right="16" bottom="16" left="16"/>
+                    <Insets bottom="16" left="16" right="16" top="16" />
                 </padding>
 
-                <Label text="📋 Danh sách khóa học"
-                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                <Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;" text="📋 Danh sách khóa học" />
 
                 <!-- FILTER BAR -->
-                <HBox spacing="10" alignment="CENTER_LEFT"
-                      style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #e5e7eb;">
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #e5e7eb;">
                     <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
+                        <Insets bottom="10" left="10" right="10" top="10" />
                     </padding>
 
-                    <Label text="Danh mục:" style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <ComboBox fx:id="cbFilterCategory" promptText="Tất cả"
-                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Danh mục:" />
+                    <ComboBox fx:id="cbFilterCategory" promptText="Tất cả" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" />
 
-                    <Region HBox.hgrow="ALWAYS"/>
+                    <Region HBox.hgrow="ALWAYS" />
 
-                    <TextField fx:id="txtSearch" promptText="Tìm theo tên khóa học..."
-                               prefWidth="240"
-                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <TextField fx:id="txtSearch" prefWidth="240" promptText="Tìm theo tên khóa học..." style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" />
 
-                    <Button text="🔍 Tìm"
-                            onAction="#handleSearch"
-                            style="-fx-background-color: #2563eb;
-                                   -fx-text-fill: white;
-                                   -fx-font-weight: bold;
-                                   -fx-background-radius: 10;
-                                   -fx-padding: 8 12;
-                                   -fx-cursor: hand;"/>
+                    <Button onAction="#handleSearch" style="-fx-background-color: #2563eb;                                    -fx-text-fill: white;                                    -fx-font-weight: bold;                                    -fx-background-radius: 10;                                    -fx-padding: 8 12;                                    -fx-cursor: hand;" text="🔍 Tìm" />
 
-                    <Button text="↩ Reset"
-                            onAction="#handleResetFilter"
-                            style="-fx-background-color: #e5e7eb;
-                                   -fx-text-fill: #111827;
-                                   -fx-font-weight: bold;
-                                   -fx-background-radius: 10;
-                                   -fx-padding: 8 12;
-                                   -fx-cursor: hand;"/>
+                    <Button onAction="#handleResetFilter" style="-fx-background-color: #e5e7eb;                                    -fx-text-fill: #111827;                                    -fx-font-weight: bold;                                    -fx-background-radius: 10;                                    -fx-padding: 8 12;                                    -fx-cursor: hand;" text="↩ Reset" />
                 </HBox>
 
                 <!-- TABLE -->
-                <TableView fx:id="tblCourses" prefHeight="520"
-                           style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;">
+                <TableView fx:id="tblCourses" prefHeight="454.0" prefWidth="997.0" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;">
                     <columns>
-                        <TableColumn fx:id="colId" text="Mã" prefWidth="70"/>
-                        <TableColumn fx:id="colName" text="Tên khóa học" prefWidth="220"/>
-                        <TableColumn fx:id="colCategory" text="Danh mục" prefWidth="160"/>
-                        <TableColumn fx:id="colFee" text="Học phí" prefWidth="110"/>
-                        <TableColumn fx:id="colDuration" text="Giờ" prefWidth="70"/>
-                        <TableColumn fx:id="colMaxSeats" text="Tối đa" prefWidth="70"/>
-                        <TableColumn fx:id="colAvailableSeats" text="Còn" prefWidth="70"/>
-                        <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="110"/>
-                        <TableColumn fx:id="colImage" text="Ảnh" prefWidth="90"/>
+                        <TableColumn fx:id="colId" prefWidth="70" text="Mã" />
+                        <TableColumn fx:id="colName" prefWidth="220" text="Tên khóa học" />
+                        <TableColumn fx:id="colCategory" prefWidth="160" text="Danh mục" />
+                        <TableColumn fx:id="colFee" prefWidth="110" text="Học phí" />
+                        <TableColumn fx:id="colDuration" prefWidth="70" text="Giờ" />
+                        <TableColumn fx:id="colMaxSeats" prefWidth="70" text="Tối đa" />
+                        <TableColumn fx:id="colAvailableSeats" prefWidth="70" text="Còn" />
+                        <TableColumn fx:id="colStatus" prefWidth="110" text="Trạng thái" />
+                        <TableColumn fx:id="colImage" prefWidth="90" text="Ảnh" />
                     </columns>
                 </TableView>
 
-                <Label text="💡 Mẹo: Click 1 dòng trong bảng để tự đổ dữ liệu sang form bên phải."
-                       wrapText="true"
-                       style="-fx-text-fill: #6b7280;"/>
+                <Label style="-fx-text-fill: #6b7280;" text="💡 Mẹo: Click 1 dòng trong bảng để tự đổ dữ liệu sang form bên phải." wrapText="true" />
             </VBox>
 
             <!-- RIGHT: FORM CARD -->
-            <VBox spacing="12"
-                  style="-fx-background-color: white;
-                         -fx-background-radius: 14;
-                         -fx-border-radius: 14;
-                         -fx-border-color: #e5e7eb;
-                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 16, 0, 0, 4);">
+            <VBox spacing="12" style="-fx-background-color: white;                          -fx-background-radius: 14;                          -fx-border-radius: 14;                          -fx-border-color: #e5e7eb;                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 16, 0, 0, 4);">
                 <padding>
-                    <Insets top="16" right="16" bottom="16" left="16"/>
+                    <Insets bottom="16" left="16" right="16" top="16" />
                 </padding>
 
-                <Label text="🧾 Thông tin khóa học"
-                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                <Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;" text="🧾 Thông tin khóa học" />
 
                 <GridPane hgap="10" vgap="10">
                     <columnConstraints>
-                        <ColumnConstraints minWidth="130"/>
-                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints minWidth="130" />
+                        <ColumnConstraints hgrow="ALWAYS" />
                     </columnConstraints>
 
-                    <Label text="Mã khóa học:" GridPane.rowIndex="0" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtId" editable="false" promptText="Tự động"
-                               GridPane.rowIndex="0" GridPane.columnIndex="1"
-                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Tên khóa học:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <TextField fx:id="txtName" promptText="Nhập tên khóa học..." style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                    <Label text="Tên khóa học:" GridPane.rowIndex="1" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtName" promptText="Nhập tên khóa học..."
-                               GridPane.rowIndex="1" GridPane.columnIndex="1"
-                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Danh mục:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <ComboBox fx:id="cbCategory" promptText="Chọn danh mục" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                    <Label text="Danh mục:" GridPane.rowIndex="2" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <ComboBox fx:id="cbCategory" promptText="Chọn danh mục"
-                              GridPane.rowIndex="2" GridPane.columnIndex="1"
-                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Trạng thái:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <ComboBox fx:id="cbStatus" promptText="MỞ / ĐÓNG" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                    <Label text="Trạng thái:" GridPane.rowIndex="3" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <ComboBox fx:id="cbStatus" promptText="MỞ / ĐÓNG"
-                              GridPane.rowIndex="3" GridPane.columnIndex="1"
-                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Học phí:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                    <TextField fx:id="txtFee" promptText="VD: 2500000" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-                    <Label text="Học phí:" GridPane.rowIndex="4" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtFee" promptText="VD: 2500000"
-                               GridPane.rowIndex="4" GridPane.columnIndex="1"
-                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Số giờ học:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                    <TextField fx:id="txtDuration" promptText="VD: 30" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
-                    <Label text="Số giờ học:" GridPane.rowIndex="5" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtDuration" promptText="VD: 30"
-                               GridPane.rowIndex="5" GridPane.columnIndex="1"
-                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Số chỗ tối đa:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                    <TextField fx:id="txtMaxSeats" promptText="VD: 40" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" GridPane.columnIndex="1" GridPane.rowIndex="6" />
 
-                    <Label text="Số chỗ tối đa:" GridPane.rowIndex="6" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtMaxSeats" promptText="VD: 40"
-                               GridPane.rowIndex="6" GridPane.columnIndex="1"
-                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Người tạo:" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+                    <TextField fx:id="txtCreatedBy" promptText="admin" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" GridPane.columnIndex="1" GridPane.rowIndex="8" />
 
-                    <Label text="Số chỗ còn:" GridPane.rowIndex="7" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtAvailableSeats" promptText="VD: 40"
-                               GridPane.rowIndex="7" GridPane.columnIndex="1"
-                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Người cập nhật:" GridPane.columnIndex="0" GridPane.rowIndex="9" />
+                    <TextField fx:id="txtUpdatedBy" promptText="admin" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" GridPane.columnIndex="1" GridPane.rowIndex="9" />
 
-                    <Label text="Người tạo:" GridPane.rowIndex="8" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtCreatedBy" promptText="admin"
-                               GridPane.rowIndex="8" GridPane.columnIndex="1"
-                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
-
-                    <Label text="Người cập nhật:" GridPane.rowIndex="9" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <TextField fx:id="txtUpdatedBy" promptText="admin"
-                               GridPane.rowIndex="9" GridPane.columnIndex="1"
-                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
-
-                    <Label text="Mô tả:" GridPane.rowIndex="10" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
-                    <TextArea fx:id="txtDescription" promptText="Nhập mô tả..."
-                              prefRowCount="4"
-                              GridPane.rowIndex="10" GridPane.columnIndex="1"
-                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Mô tả:" GridPane.columnIndex="0" GridPane.rowIndex="10" />
+                    <TextArea fx:id="txtDescription" prefHeight="23.0" prefRowCount="4" prefWidth="456.0" promptText="Nhập mô tả..." style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" GridPane.columnIndex="1" GridPane.rowIndex="10" />
 
                     <!-- IMAGE -->
-                    <Label text="Ảnh khóa học:" GridPane.rowIndex="11" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Ảnh khóa học:" GridPane.columnIndex="0" GridPane.rowIndex="11" />
 
-                    <HBox spacing="8" GridPane.rowIndex="11" GridPane.columnIndex="1">
-                        <TextField fx:id="txtImageUrl"
-                                   promptText="(Chọn ảnh để tự điền đường dẫn)"
-                                   HBox.hgrow="ALWAYS"
-                                   style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
-                        <Button text="📁 Chọn..."
-                                onAction="#handleChooseImage"
-                                style="-fx-background-color: #2563eb;
-                                       -fx-text-fill: white;
-                                       -fx-font-weight: bold;
-                                       -fx-background-radius: 10;
-                                       -fx-padding: 8 12;
-                                       -fx-cursor: hand;"/>
+                    <HBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="11">
+                        <TextField fx:id="txtImageUrl" promptText="(Chọn ảnh để tự điền đường dẫn)" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;" HBox.hgrow="ALWAYS" />
+                        <Button onAction="#handleChooseImage" style="-fx-background-color: #2563eb;                                        -fx-text-fill: white;                                        -fx-font-weight: bold;                                        -fx-background-radius: 10;                                        -fx-padding: 8 12;                                        -fx-cursor: hand;" text="📁 Chọn..." />
                     </HBox>
 
-                    <Label text="Xem trước:" GridPane.rowIndex="12" GridPane.columnIndex="0"
-                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Xem trước:" GridPane.columnIndex="0" GridPane.rowIndex="12" />
 
-                    <StackPane GridPane.rowIndex="12" GridPane.columnIndex="1"
-                               style="-fx-background-color: #f8fafc;
-                                      -fx-background-radius: 12;
-                                      -fx-border-radius: 12;
-                                      -fx-border-color: #e5e7eb;">
+                    <StackPane style="-fx-background-color: #f8fafc;                                       -fx-background-radius: 12;                                       -fx-border-radius: 12;                                       -fx-border-color: #e5e7eb;" GridPane.columnIndex="1" GridPane.rowIndex="12">
                         <padding>
-                            <Insets top="10" right="10" bottom="10" left="10"/>
+                            <Insets bottom="10" left="10" right="10" top="10" />
                         </padding>
 
-                        <ImageView fx:id="imgPreview"
-                                   fitWidth="240" fitHeight="150"
-                                   preserveRatio="true"/>
+                        <ImageView fx:id="imgPreview" fitHeight="110.0" fitWidth="240" preserveRatio="true" />
                     </StackPane>
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
 
                 </GridPane>
 
                 <!-- CRUD BUTTONS -->
                 <HBox spacing="10">
-                    <Button text="➕ Thêm"
-                            onAction="#handleAdd"
-                            style="-fx-background-color: #22c55e;
-                                   -fx-text-fill: white;
-                                   -fx-font-weight: bold;
-                                   -fx-background-radius: 10;
-                                   -fx-padding: 9 14;
-                                   -fx-cursor: hand;"/>
+                    <Button onAction="#handleAdd" style="-fx-background-color: #22c55e;                                    -fx-text-fill: white;                                    -fx-font-weight: bold;                                    -fx-background-radius: 10;                                    -fx-padding: 9 14;                                    -fx-cursor: hand;" text="➕ Thêm" />
 
-                    <Button text="✏️ Sửa"
-                            onAction="#handleUpdate"
-                            style="-fx-background-color: #f59e0b;
-                                   -fx-text-fill: white;
-                                   -fx-font-weight: bold;
-                                   -fx-background-radius: 10;
-                                   -fx-padding: 9 14;
-                                   -fx-cursor: hand;"/>
+                    <Button onAction="#handleUpdate" style="-fx-background-color: #f59e0b;                                    -fx-text-fill: white;                                    -fx-font-weight: bold;                                    -fx-background-radius: 10;                                    -fx-padding: 9 14;                                    -fx-cursor: hand;" text="✏️ Sửa" />
 
-                    <Button text="🗑 Xóa"
-                            onAction="#handleDelete"
-                            style="-fx-background-color: #ef4444;
-                                   -fx-text-fill: white;
-                                   -fx-font-weight: bold;
-                                   -fx-background-radius: 10;
-                                   -fx-padding: 9 14;
-                                   -fx-cursor: hand;"/>
+                    <Button onAction="#handleDelete" style="-fx-background-color: #ef4444;                                    -fx-text-fill: white;                                    -fx-font-weight: bold;                                    -fx-background-radius: 10;                                    -fx-padding: 9 14;                                    -fx-cursor: hand;" text="🗑 Xóa" />
 
-                    <Region HBox.hgrow="ALWAYS"/>
+                    <Region HBox.hgrow="ALWAYS" />
 
-                    <Button text="🔄 Làm mới"
-                            onAction="#handleClear"
-                            style="-fx-background-color: #e5e7eb;
-                                   -fx-text-fill: #111827;
-                                   -fx-font-weight: bold;
-                                   -fx-background-radius: 10;
-                                   -fx-padding: 9 14;
-                                   -fx-cursor: hand;"/>
+                    <Button onAction="#handleClear" style="-fx-background-color: #e5e7eb;                                    -fx-text-fill: #111827;                                    -fx-font-weight: bold;                                    -fx-background-radius: 10;                                    -fx-padding: 9 14;                                    -fx-cursor: hand;" text="🔄 Làm mới" />
                 </HBox>
 
-                <Label fx:id="lblMsg" wrapText="true"
-                       style="-fx-text-fill: #2563eb; -fx-font-weight: bold;"/>
-
-                <Label text="⚠ Lưu ý: Ảnh nên là .png/.jpg và dung lượng nhỏ để load nhanh."
-                       wrapText="true"
-                       style="-fx-text-fill: #6b7280;"/>
+                <Label fx:id="lblMsg" style="-fx-text-fill: #2563eb; -fx-font-weight: bold;" wrapText="true" />
             </VBox>
 
         </SplitPane>
     </center>
 
     <padding>
-        <Insets top="12" right="12" bottom="12" left="12"/>
+        <Insets bottom="12" left="12" right="12" top="12" />
     </padding>
 
 </BorderPane>

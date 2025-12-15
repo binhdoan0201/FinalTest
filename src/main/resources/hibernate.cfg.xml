@@ -10,14 +10,20 @@
             com.microsoft.sqlserver.jdbc.SQLServerDriver
         </property>
 
+		<!-- Hưng -->
         <property name="hibernate.connection.url">
-  		jdbc:sqlserver://localhost:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true;
+  		jdbc:sqlserver://MSI\SQLEXPRESS:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true;instance=SQLEXPRESS
         </property>
 
-
+		<!-- Dũng 
         <property name="hibernate.connection.username">admin_java</property>
         <property name="hibernate.connection.password">123456</property>
-
+		 -->
+		 <!-- Hưng -->
+		 <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.connection.password">123</property>
+        
+        
         <!-- Hibernate config -->
         <property name="hibernate.dialect">
             org.hibernate.dialect.SQLServerDialect
