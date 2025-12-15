@@ -19,8 +19,8 @@ public class LoginController {
 
     @FXML
     private void handleLogin() {
-        String username = usernameField.getText().trim();
-        String password = passwordField.getText();
+        String username = usernameField.getText() == null ? "" : usernameField.getText().trim();
+        String password = passwordField.getText() == null ? "" : passwordField.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
             errorLabel.setText("Vui lòng nhập đầy đủ thông tin!");
@@ -31,15 +31,15 @@ public class LoginController {
 
             Account account = session.createQuery(
                     "FROM Account WHERE username = :u", Account.class)
-                    .setParameter("u", username)
-                    .uniqueResult();
+                .setParameter("u", username)
+                .uniqueResult();
 
             if (account == null || !account.isEnabled()) {
                 errorLabel.setText("Tài khoản không tồn tại hoặc bị khóa!");
                 return;
             }
 
-            // Tạm thời so sánh plain text để test
+            // Demo: so sánh plain text
             if (!password.equals(account.getPassword())) {
                 errorLabel.setText("Sai mật khẩu!");
                 return;
@@ -52,16 +52,9 @@ public class LoginController {
             String role = account.getRole() == null ? "" : account.getRole().toUpperCase();
 
             switch (role) {
-                case "ADMIN":
-                    loadScene("admin-dashboard.fxml");
-                    break;
-                case "STAFF":
-                    loadScene("staff-dashboard.fxml");
-                    break;
-                default:
-                    // STUDENT -> chuyển qua student-dashboard.fxml
-                    loadScene("student-dashboard.fxml");
-                    break;
+                case "ADMIN" -> loadScene("admin-dashboard.fxml", "UCOP Education - ADMIN");
+                case "STAFF" -> loadScene("staff-dashboard.fxml", "UCOP Education - STAFF");
+                default -> loadScene("student-dashboard.fxml", "UCOP Education - STUDENT");
             }
 
         } catch (Exception e) {
@@ -70,24 +63,41 @@ public class LoginController {
         }
     }
 
-    private void loadScene(String fxmlFile) {
+    private void loadScene(String fxmlFile, String title) {
         try {
-            String path = "/fxml/" + fxmlFile;
+            String fxmlPath = "/fxml/" + fxmlFile;
 
-            var url = getClass().getResource(path);
-            if (url == null) {
-                throw new RuntimeException("Không tìm thấy FXML: " + path);
-            }
+            var url = getClass().getResource(fxmlPath);
+            if (url == null) throw new RuntimeException("Không tìm thấy FXML: " + fxmlPath);
 
             Parent root = FXMLLoader.load(url);
 
+            Scene scene = new Scene(root, 1200, 800);
+
+            // ✅ GẮN CSS Ở ĐÂY
+            addStylesheet(scene, "/css/student.css");   // UI xịn cho student
+            addStylesheet(scene, "/css/app.css");       // (tuỳ chọn) nếu bạn có css chung
+
             Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(root, 1200, 800));
-            stage.setTitle("UCOP Education - " + CurrentUser.getCurrentAccount().getRole());
+            stage.setTitle(title);
+            stage.setScene(scene);
             stage.show();
 
         } catch (Exception e) {
             e.printStackTrace();
+            errorLabel.setText("Không thể load màn hình: " + fxmlFile);
+        }
+    }
+
+    private void addStylesheet(Scene scene, String cssPath) {
+        try {
+            var cssUrl = getClass().getResource(cssPath);
+            if (cssUrl != null) {
+                String css = cssUrl.toExternalForm();
+                if (!scene.getStylesheets().contains(css)) scene.getStylesheets().add(css);
+            }
+        } catch (Exception ignore) {
+            // không crash nếu thiếu css
         }
     }
 }

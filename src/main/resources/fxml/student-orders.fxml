@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ucop.edu.controller.StudentOrdersController"
+      spacing="14"
+      style="-fx-background-color: #f1f5f9;">
+
+    <padding>
+        <Insets top="18" right="18" bottom="18" left="18"/>
+    </padding>
+
+    <!-- HEADER CARD -->
+    <HBox spacing="12" alignment="CENTER_LEFT"
+          style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 16; -fx-background-radius: 16; -fx-padding: 16;">
+        <VBox spacing="4">
+            <Label text="Đơn hàng của tôi" style="-fx-text-fill: #0f172a;">
+                <font>
+                    <Font size="20"/>
+                </font>
+            </Label>
+            <Label text="Theo dõi đơn hàng, xem chi tiết từng khóa học đã đặt"
+                   style="-fx-text-fill: #64748b;"/>
+        </VBox>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button text="↻ Refresh" onAction="#reloadOrders"
+                style="-fx-background-color: white; -fx-border-color: #94a3b8; -fx-text-fill: #0f172a;
+                       -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 10 14;"/>
+
+        <Button text="Xem chi tiết" onAction="#viewSelectedOrder"
+                style="-fx-background-color: #2563eb; -fx-text-fill: white;
+                       -fx-background-radius: 12; -fx-padding: 10 16;"/>
+    </HBox>
+
+    <!-- TABLE CARD -->
+    <VBox spacing="10"
+          style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 16; -fx-background-radius: 16; -fx-padding: 14;">
+        <Label text="Danh sách đơn hàng"
+               style="-fx-text-fill: #0f172a; -fx-font-weight: bold; -fx-font-size: 14;"/>
+
+        <TableView fx:id="orderTable" prefHeight="460"
+                   style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-background-radius: 12;">
+            <columns>
+                <TableColumn fx:id="colOrderId" text="Mã đơn" prefWidth="90"/>
+                <TableColumn fx:id="colCreated" text="Ngày tạo" prefWidth="240"/>
+                <TableColumn fx:id="colTotal" text="Tổng tiền" prefWidth="180"/>
+                <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="140"/>
+            </columns>
+        </TableView>
+
+        <Label text="Tip: Click chọn 1 dòng rồi bấm 'Xem chi tiết' để xem khóa học trong đơn."
+               style="-fx-text-fill: #64748b;"/>
+    </VBox>
+
+</VBox>

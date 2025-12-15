@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ucop.edu.controller.StudentCoursesController"
+      stylesheets="@/css/student.css"
+      spacing="14"
+      style="-fx-background-color: white;">
+
+    <padding>
+        <Insets top="18" right="18" bottom="18" left="18"/>
+    </padding>
+
+    <Label text="📚 Danh sách khóa học" styleClass="title"/>
+
+    <TableView fx:id="courseTable" prefHeight="520">
+        <columns>
+            <TableColumn fx:id="colImg" text="Ảnh" prefWidth="110"/>
+            <TableColumn fx:id="colId" text="ID" prefWidth="70"/>
+            <TableColumn fx:id="colName" text="Tên khóa học" prefWidth="420"/>
+            <TableColumn fx:id="colFee" text="Học phí" prefWidth="150"/>
+            <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120"/>
+            <TableColumn fx:id="colRegistered" text="Đã đăng ký" prefWidth="120"/>
+            <TableColumn fx:id="colAction" text=" " prefWidth="80"/>
+        </columns>
+    </TableView>
+
+    <!-- Bottom bar -->
+    <HBox spacing="12" styleClass="card" alignment="CENTER_LEFT">
+        <Label text="Tip:" styleClass="muted"/>
+        <Label text="Bấm icon 🛒 để thêm khóa học vào giỏ." styleClass="muted"/>
+
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button text="Reload" onAction="#reload" styleClass="btn-outline"/>
+    </HBox>
+
+</VBox>
