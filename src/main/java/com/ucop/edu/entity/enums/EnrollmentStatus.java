@@ -8,6 +8,6 @@ public enum EnrollmentStatus {
     SCHEDULED,
     COMPLETED,
     CANCELED,
-    REFUNDED,
-    RMA_REQUESTED
+    RMA_REQUESTED,
+    REFUNDED
 }

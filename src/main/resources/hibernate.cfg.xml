@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE hibernate-configuration PUBLIC
+<!-- <!DOCTYPE hibernate-configuration PUBLIC
         "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd"> -->
 <hibernate-configuration>
     <session-factory>
 
@@ -11,11 +11,11 @@
         </property>
 
         <property name="hibernate.connection.url">
-  		jdbc:sqlserver://TJR\SQLEXPRESS:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true
+  		jdbc:sqlserver://localhost:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true;
         </property>
 
 
-        <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.connection.username">admin_java</property>
         <property name="hibernate.connection.password">123456</property>
 
         <!-- Hibernate config -->
