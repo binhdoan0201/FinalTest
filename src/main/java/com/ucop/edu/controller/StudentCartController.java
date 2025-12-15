@@ -259,8 +259,46 @@ public class StudentCartController {
 
     @FXML
     private void clearCart() {
-        // bạn làm sau cũng được
+
+        // ✅ hỏi xác nhận
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Xác nhận");
+        confirm.setHeaderText("Xóa tất cả khóa học trong giỏ?");
+        confirm.setContentText("Hành động này không thể hoàn tác.");
+
+        ButtonType btnYes = new ButtonType("Xóa", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnNo  = new ButtonType("Hủy", ButtonBar.ButtonData.CANCEL_CLOSE);
+        confirm.getButtonTypes().setAll(btnYes, btnNo);
+
+        var result = confirm.showAndWait();
+        if (result.isEmpty() || result.get() != btnYes) return; // bấm Hủy thì thôi
+
+        // ✅ xóa DB
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Long sid = CurrentUser.getCurrentAccount().getId();
+
+            tx = session.beginTransaction();
+
+            int deleted = session.createQuery(
+                    "delete from CartItem ci where ci.cart.student.id = :sid"
+            ).setParameter("sid", sid).executeUpdate();
+
+            tx.commit();
+
+            alert(Alert.AlertType.INFORMATION, "OK", "Đã xóa " + deleted + " khóa học trong giỏ.");
+            reload();
+
+            // nếu bạn có badge giỏ hàng
+            StudentDashboardController.requestCartBadgeRefresh();
+
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) tx.rollback();
+            e.printStackTrace();
+            alert(Alert.AlertType.ERROR, "Lỗi", "Không xóa được giỏ hàng: " + e.getMessage());
+        }
     }
+
 
     private void alert(Alert.AlertType type, String title, String msg) {
         Alert a = new Alert(type);

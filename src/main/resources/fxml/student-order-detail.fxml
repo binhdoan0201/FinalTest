@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ucop.edu.controller.StudentOrderDetailController"
+      spacing="14" style="-fx-background-color: #f1f5f9;">
+
+    <padding>
+        <Insets top="18" right="18" bottom="18" left="18"/>
+    </padding>
+
+    <!-- Header -->
+    <HBox spacing="12" alignment="CENTER_LEFT"
+          styleClass="card">
+        <VBox spacing="4">
+            <Label fx:id="titleLabel" text="Chi tiết đơn hàng" styleClass="title"/>
+            <Label fx:id="subLabel" text="" styleClass="muted"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="Tổng:" styleClass="muted"/>
+        <Label fx:id="totalLabel" text="0 VNĐ" styleClass="money"/>
+    </HBox>
+
+    <!-- Table -->
+    <VBox spacing="10" styleClass="card">
+        <Label text="Danh sách khóa học" style="-fx-font-weight: bold;"/>
+
+        <TableView fx:id="itemTable" prefHeight="520">
+            <columns>
+                <TableColumn fx:id="colImg" text="Ảnh" prefWidth="120"/>
+                <TableColumn fx:id="colName" text="Khóa học" prefWidth="420"/>
+                <TableColumn fx:id="colQty" text="SL" prefWidth="90"/>
+                <TableColumn fx:id="colPrice" text="Giá" prefWidth="160"/>
+                <TableColumn fx:id="colLine" text="Thành tiền" prefWidth="180"/>
+            </columns>
+        </TableView>
+    </VBox>
+
+</VBox>

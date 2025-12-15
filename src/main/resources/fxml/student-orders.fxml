@@ -54,9 +54,5 @@
                 <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="140"/>
             </columns>
         </TableView>
-
-        <Label text="Tip: Click chọn 1 dòng rồi bấm 'Xem chi tiết' để xem khóa học trong đơn."
-               style="-fx-text-fill: #64748b;"/>
     </VBox>
-
 </VBox>

@@ -44,7 +44,4 @@
                     style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 10 16;"/>
         </HBox>
     </VBox>
-
-    <Label text="Tip: Ảnh lấy từ course.imageUrl (VD: /images/Java.png hoặc Java.png)"
-           style="-fx-text-fill: #64748b;"/>
 </VBox>
