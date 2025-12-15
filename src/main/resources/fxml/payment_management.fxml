@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ucop.edu.controller.PaymentManagementController"
+            style="-fx-background-color: #f3f6fb;">
+
+    <top>
+        <HBox spacing="12"
+              style="-fx-background-color: linear-gradient(to right, #2563eb, #1d4ed8);
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 14, 0, 0, 3);">
+            <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+
+            <Label text="QUẢN LÝ THANH TOÁN"
+                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="⬅ Quay lại"
+                    onAction="#backToDashboard"
+                    style="-fx-background-color: rgba(255,255,255,0.18);
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-background-radius: 10;
+                           -fx-padding: 8 14;
+                           -fx-cursor: hand;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.62" style="-fx-background-color: transparent;">
+
+            <!-- LEFT -->
+            <VBox spacing="12"
+                  style="-fx-background-color: white;
+                         -fx-background-radius: 14;
+                         -fx-border-radius: 14;
+                         -fx-border-color: #e5e7eb;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 16, 0, 0, 4);">
+                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+                <Label text="📋 Danh sách Payment"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+
+                <HBox spacing="10" alignment="CENTER_LEFT"
+                      style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #e5e7eb;">
+                    <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+
+                    <Label text="Status:" style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cbFilterStatus" promptText="Tất cả"
+                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Label text="Method:" style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cbFilterMethod" promptText="Tất cả"
+                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <TextField fx:id="txtSearch" promptText="Tìm theo enrollmentCode / username..."
+                               prefWidth="260"
+                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Button text="🔍 Lọc" onAction="#handleFilter"
+                            style="-fx-background-color: #2563eb;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 8 12;
+                                   -fx-cursor: hand;"/>
+
+                    <Button text="↩ Reset" onAction="#handleReset"
+                            style="-fx-background-color: #e5e7eb;
+                                   -fx-text-fill: #111827;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 8 12;
+                                   -fx-cursor: hand;"/>
+                </HBox>
+
+                <TableView fx:id="tblPayments" prefHeight="420"
+                           style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;">
+                    <columns>
+                        <TableColumn fx:id="colPayId" text="ID" prefWidth="70"/>
+                        <TableColumn fx:id="colEnroll" text="Enrollment" prefWidth="140"/>
+                        <TableColumn fx:id="colStudent" text="Student" prefWidth="140"/>
+                        <TableColumn fx:id="colAmount" text="Amount" prefWidth="110"/>
+                        <TableColumn fx:id="colMethod" text="Method" prefWidth="120"/>
+                        <TableColumn fx:id="colStatus" text="Status" prefWidth="110"/>
+                        <TableColumn fx:id="colPaidAt" text="PaidAt" prefWidth="150"/>
+                    </columns>
+                </TableView>
+
+                <Label text="🧾 Refund theo Payment đang chọn"
+                       style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+
+                <TableView fx:id="tblRefunds" prefHeight="200"
+                           style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;">
+                    <columns>
+                        <TableColumn fx:id="colRefundId" text="ID" prefWidth="70"/>
+                        <TableColumn fx:id="colRefundAmount" text="Amount" prefWidth="110"/>
+                        <TableColumn fx:id="colRefundStatus" text="Status" prefWidth="120"/>
+                        <TableColumn fx:id="colRefundAt" text="ProcessedAt" prefWidth="160"/>
+                    </columns>
+                </TableView>
+
+                <Label fx:id="lblMsg" wrapText="true"
+                       style="-fx-text-fill: #2563eb; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <!-- RIGHT -->
+            <VBox spacing="12"
+                  style="-fx-background-color: white;
+                         -fx-background-radius: 14;
+                         -fx-border-radius: 14;
+                         -fx-border-color: #e5e7eb;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 16, 0, 0, 4);">
+                <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+                <Label text="💳 Tạo / Cập nhật Payment"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+
+                <GridPane hgap="10" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="130"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+
+                    <Label text="Enrollment:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cbEnrollment" promptText="Chọn enrollment..."
+                              GridPane.rowIndex="0" GridPane.columnIndex="1"
+                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Label text="Amount:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtAmount" promptText="VD: 2500000"
+                               GridPane.rowIndex="1" GridPane.columnIndex="1"
+                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Label text="Method:" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cbMethod" promptText="COD / BANK_TRANSFER / GATEWAY / WALLET"
+                              GridPane.rowIndex="2" GridPane.columnIndex="1"
+                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Label text="Status:" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cbPayStatus" promptText="PENDING / PAID ..."
+                              GridPane.rowIndex="3" GridPane.columnIndex="1"
+                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Label text="TransactionId:" GridPane.rowIndex="4" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtTransactionId" promptText="(tự sinh nếu để trống)"
+                               GridPane.rowIndex="4" GridPane.columnIndex="1"
+                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                </GridPane>
+
+                <HBox spacing="10">
+                    <Button text="➕ Tạo Payment" onAction="#handleCreatePayment"
+                            style="-fx-background-color: #22c55e;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 9 14;
+                                   -fx-cursor: hand;"/>
+                    <Button text="✅ Mark PAID" onAction="#handleMarkPaid"
+                            style="-fx-background-color: #2563eb;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 9 14;
+                                   -fx-cursor: hand;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="🔄 Làm mới" onAction="#handleClearForm"
+                            style="-fx-background-color: #e5e7eb;
+                                   -fx-text-fill: #111827;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 9 14;
+                                   -fx-cursor: hand;"/>
+                </HBox>
+
+                <Separator/>
+
+                <Label text="↩ Refund (theo Payment đang chọn)"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+
+                <GridPane hgap="10" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="130"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+
+                    <Label text="Refund Amount:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <TextField fx:id="txtRefundAmount" promptText="VD: 500000"
+                               GridPane.rowIndex="0" GridPane.columnIndex="1"
+                               style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Label text="Reason:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <TextArea fx:id="txtRefundReason" promptText="Lý do hoàn tiền..."
+                              prefRowCount="3"
+                              GridPane.rowIndex="1" GridPane.columnIndex="1"
+                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+                </GridPane>
+
+                <HBox spacing="10">
+                    <Button text="📩 Request Refund" onAction="#handleRequestRefund"
+                            style="-fx-background-color: #f59e0b;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 9 14;
+                                   -fx-cursor: hand;"/>
+                    <Button text="⚙ Process Refund" onAction="#handleProcessRefund"
+                            style="-fx-background-color: #ef4444;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 9 14;
+                                   -fx-cursor: hand;"/>
+                </HBox>
+
+                <Label text="💡 WALLET: Mark PAID sẽ trừ ví; Process Refund sẽ cộng lại ví."
+                       wrapText="true"
+                       style="-fx-text-fill: #6b7280;"/>
+            </VBox>
+
+        </SplitPane>
+    </center>
+
+    <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+</BorderPane>

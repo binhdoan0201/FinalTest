@@ -1,9 +1,11 @@
 package com.ucop.edu.entity;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -14,8 +16,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ===== STUDENT =====
-    @ManyToOne(fetch = FetchType.LAZY)
+    // ===== STUDENT (Account) =====
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "student_id", nullable = false)
     private Account student;
 
@@ -28,6 +30,7 @@ public class Order {
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
     // ===== STATUS =====
+    // DB bạn chưa có CHECK cho orders.status nên để String ok
     @Column(name = "status", length = 20, nullable = false)
     private String status = "PENDING";
 
@@ -42,16 +45,68 @@ public class Order {
 
     public Order() {}
 
+    // ================= LIFECYCLE =================
+    @PrePersist
+    protected void prePersist() {
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (totalAmount == null) totalAmount = BigDecimal.ZERO;
+        if (status == null || status.isBlank()) status = "PENDING";
+        // đảm bảo 2 chiều nếu có items trước khi persist
+        if (items != null) {
+            for (OrderItem it : items) {
+                if (it != null) it.setOrder(this);
+            }
+        }
+        recalculateTotal();
+    }
+
+    @PreUpdate
+    protected void preUpdate() {
+        if (totalAmount == null) totalAmount = BigDecimal.ZERO;
+        if (status == null || status.isBlank()) status = "PENDING";
+        recalculateTotal();
+    }
+
     // ================= HELPER METHODS =================
-    // ✅ BẮT BUỘC: set quan hệ 2 chiều để Hibernate insert đúng
+    /** ✅ Bắt buộc set quan hệ 2 chiều */
     public void addItem(OrderItem item) {
+        if (item == null) return;
+        if (items == null) items = new HashSet<>();
         items.add(item);
         item.setOrder(this);
+        recalculateTotal();
     }
 
     public void removeItem(OrderItem item) {
+        if (item == null || items == null) return;
         items.remove(item);
         item.setOrder(null);
+        recalculateTotal();
+    }
+
+    public void clearItems() {
+        if (items == null) return;
+        for (OrderItem it : items) {
+            if (it != null) it.setOrder(null);
+        }
+        items.clear();
+        recalculateTotal();
+    }
+
+    /** ✅ Tính lại totalAmount từ items (an toàn null) */
+    public void recalculateTotal() {
+        BigDecimal sum = BigDecimal.ZERO;
+        if (items != null) {
+            for (OrderItem it : items) {
+                if (it == null) continue;
+
+                BigDecimal price = it.getUnitPrice() == null ? BigDecimal.ZERO : it.getUnitPrice();
+                Integer qty = it.getQuantity() == null ? 0 : it.getQuantity();
+
+                sum = sum.add(price.multiply(BigDecimal.valueOf(qty)));
+            }
+        }
+        totalAmount = sum;
     }
 
     // ================= GETTER / SETTER =================
@@ -65,11 +120,35 @@ public class Order {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     public BigDecimal getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = (totalAmount == null) ? BigDecimal.ZERO : totalAmount;
+    }
 
     public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(String status) {
+        this.status = (status == null || status.isBlank()) ? "PENDING" : status;
+    }
 
     public Set<OrderItem> getItems() { return items; }
-    public void setItems(Set<OrderItem> items) { this.items = items; }
+    public void setItems(Set<OrderItem> items) {
+        this.items = (items == null) ? new HashSet<>() : items;
+        for (OrderItem it : this.items) {
+            if (it != null) it.setOrder(this);
+        }
+        recalculateTotal();
+    }
+
+    // ================= equals/hashCode =================
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order)) return false;
+        Order other = (Order) o;
+        return id != null && Objects.equals(id, other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

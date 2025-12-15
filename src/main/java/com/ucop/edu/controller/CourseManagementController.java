@@ -59,7 +59,6 @@ public class CourseManagementController {
     @FXML private TextField txtFee;
     @FXML private TextField txtDuration;
     @FXML private TextField txtMaxSeats;
-    @FXML private TextField txtAvailableSeats;
     @FXML private TextField txtCreatedBy;
     @FXML private TextField txtUpdatedBy;
     @FXML private TextArea txtDescription;
@@ -163,7 +162,6 @@ public class CourseManagementController {
     }
 
     private void fillForm(Course c) {
-        txtId.setText(c.getId() == null ? "" : String.valueOf(c.getId()));
         txtName.setText(nvl(c.getName()));
         txtDescription.setText(nvl(c.getDescription()));
         cbCategory.setValue(c.getCategory());
@@ -172,7 +170,6 @@ public class CourseManagementController {
         txtFee.setText(c.getTuitionFee() == null ? "" : c.getTuitionFee().toPlainString());
         txtDuration.setText(c.getDurationHours() == null ? "" : String.valueOf(c.getDurationHours()));
         txtMaxSeats.setText(c.getMaxSeats() == null ? "" : String.valueOf(c.getMaxSeats()));
-        txtAvailableSeats.setText(c.getAvailableSeats() == null ? "" : String.valueOf(c.getAvailableSeats()));
 
         txtCreatedBy.setText(nvl(c.getCreatedBy()));
         txtUpdatedBy.setText(nvl(c.getUpdatedBy()));
@@ -323,7 +320,6 @@ public class CourseManagementController {
     @FXML
     private void handleClear() {
         tblCourses.getSelectionModel().clearSelection();
-        txtId.clear();
         txtName.clear();
         txtDescription.clear();
         cbCategory.setValue(null);
@@ -331,7 +327,6 @@ public class CourseManagementController {
         txtFee.clear();
         txtDuration.clear();
         txtMaxSeats.clear();
-        txtAvailableSeats.clear();
         txtCreatedBy.clear();
         txtUpdatedBy.clear();
 
@@ -369,7 +364,6 @@ public class CourseManagementController {
         BigDecimal fee = parseBigDecimalRequired(txtFee.getText(), "Tuition Fee");
         Integer duration = parseIntOptional(txtDuration.getText());
         Integer maxSeats = parseIntRequired(txtMaxSeats.getText(), "Max Seats");
-        Integer availableSeats = parseIntRequired(txtAvailableSeats.getText(), "Available Seats");
 
         CourseStatus status = cbStatus.getValue();
         if (status == null) status = CourseStatus.OPEN;
@@ -381,14 +375,14 @@ public class CourseManagementController {
         c.setTuitionFee(fee);
         c.setDurationHours(duration);
         c.setMaxSeats(maxSeats);
-        c.setAvailableSeats(availableSeats);
+        c.setAvailableSeats(maxSeats);
         c.setDescription(txtDescription.getText());
 
         // NEW: imageUrl
         c.setImageUrl(safeTrim(txtImageUrl.getText()));
 
-        c.setCreatedBy(safeTrim(txtCreatedBy.getText()));
-        c.setUpdatedBy(safeTrim(txtUpdatedBy.getText()));
+        c.setCreatedBy("ADMIN");
+        c.setUpdatedBy("ADMIN");
         c.setCreatedAt(LocalDateTime.now());
         c.setUpdatedAt(LocalDateTime.now());
         return c;
@@ -407,7 +401,6 @@ public class CourseManagementController {
         c.setTuitionFee(parseBigDecimalRequired(txtFee.getText(), "Tuition Fee"));
         c.setDurationHours(parseIntOptional(txtDuration.getText()));
         c.setMaxSeats(parseIntRequired(txtMaxSeats.getText(), "Max Seats"));
-        c.setAvailableSeats(parseIntRequired(txtAvailableSeats.getText(), "Available Seats"));
         c.setDescription(txtDescription.getText());
 
         // NEW: imageUrl
