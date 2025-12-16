@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ucop.edu.controller.StaffReturnRequestController">
+
+    <children>
+        <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10"
+              AnchorPane.rightAnchor="10" AnchorPane.bottomAnchor="10">
+
+            <HBox spacing="10">
+                <Label text="Duyệt hoàn tiền / hoàn đổi" style="-fx-font-size:18; -fx-font-weight:800;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Reload" onAction="#reload"/>
+            </HBox>
+
+            <TableView fx:id="tbl" prefHeight="360">
+                <columns>
+                    <TableColumn fx:id="colId" text="RR#" prefWidth="60"/>
+                    <TableColumn fx:id="colOrder" text="Order" prefWidth="90"/>
+                    <TableColumn fx:id="colStudent" text="Student" prefWidth="160"/>
+                    <TableColumn fx:id="colType" text="Type" prefWidth="90"/>
+                    <TableColumn fx:id="colAmount" text="Amount" prefWidth="120"/>
+                </columns>
+            </TableView>
+
+            <Label fx:id="lblMsg" text="" style="-fx-text-fill: #2563eb; -fx-font-weight: 700;"/>
+
+            <HBox spacing="10">
+                <TextField fx:id="txtApproveAmount" promptText="Approve amount (blank = AUTO)" prefWidth="220"/>
+                <TextArea fx:id="txtNote" promptText="Staff note..." prefRowCount="2" HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <HBox spacing="10">
+                <Button text="Approve" onAction="#approve"/>
+                <Button text="Reject" onAction="#reject"/>
+                <Button text="Process to Wallet" onAction="#process"/>
+            </HBox>
+
+        </VBox>
+    </children>
+</AnchorPane>

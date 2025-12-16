@@ -21,6 +21,12 @@ public class Order {
     @JoinColumn(name = "student_id", nullable = false)
     private Account student;
 
+    // ✅ LINK sang Enrollment để hoàn tiền dùng giống Payment/Đơn hàng
+    // DB cần có cột: orders.enrollment_id (FK -> enrollments.id)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "enrollment_id")
+    private Enrollment enrollment;
+
     // ===== CREATED TIME =====
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -30,7 +36,6 @@ public class Order {
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
     // ===== STATUS =====
-    // DB bạn chưa có CHECK cho orders.status nên để String ok
     @Column(name = "status", length = 20, nullable = false)
     private String status = "PENDING";
 
@@ -51,7 +56,7 @@ public class Order {
         if (createdAt == null) createdAt = LocalDateTime.now();
         if (totalAmount == null) totalAmount = BigDecimal.ZERO;
         if (status == null || status.isBlank()) status = "PENDING";
-        // đảm bảo 2 chiều nếu có items trước khi persist
+
         if (items != null) {
             for (OrderItem it : items) {
                 if (it != null) it.setOrder(this);
@@ -68,7 +73,6 @@ public class Order {
     }
 
     // ================= HELPER METHODS =================
-    /** ✅ Bắt buộc set quan hệ 2 chiều */
     public void addItem(OrderItem item) {
         if (item == null) return;
         if (items == null) items = new HashSet<>();
@@ -93,7 +97,6 @@ public class Order {
         recalculateTotal();
     }
 
-    /** ✅ Tính lại totalAmount từ items (an toàn null) */
     public void recalculateTotal() {
         BigDecimal sum = BigDecimal.ZERO;
         if (items != null) {
@@ -115,6 +118,9 @@ public class Order {
 
     public Account getStudent() { return student; }
     public void setStudent(Account student) { this.student = student; }
+
+    public Enrollment getEnrollment() { return enrollment; }
+    public void setEnrollment(Enrollment enrollment) { this.enrollment = enrollment; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

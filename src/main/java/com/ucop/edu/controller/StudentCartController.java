@@ -12,12 +12,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import com.ucop.edu.controller.StudentDashboardController;
-
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -66,8 +63,6 @@ public class StudentCartController {
 
     @FXML
     private void initialize() {
-
-        // ==== (1) ẢNH ====
         colImg.setCellValueFactory(new PropertyValueFactory<>("imageUrl"));
         colImg.setCellFactory(col -> new TableCell<>() {
             private final javafx.scene.image.ImageView iv = new javafx.scene.image.ImageView();
@@ -77,15 +72,11 @@ public class StudentCartController {
                 iv.setPreserveRatio(true);
                 iv.setSmooth(true);
             }
-            @Override
-            protected void updateItem(String url, boolean empty) {
+            @Override protected void updateItem(String url, boolean empty) {
                 super.updateItem(url, empty);
-                if (empty || url == null || url.isBlank()) {
-                    setGraphic(null);
-                    return;
-                }
+                if (empty || url == null || url.isBlank()) { setGraphic(null); return; }
                 try {
-                    iv.setImage(loadImage(url)); // hàm loadImage bạn đang có
+                    iv.setImage(loadImage(url));
                     setGraphic(iv);
                     setText(null);
                 } catch (Exception e) {
@@ -94,7 +85,6 @@ public class StudentCartController {
             }
         });
 
-        // ==== (2) TEXT/NUMBER ====
         colCourse.setCellValueFactory(new PropertyValueFactory<>("courseName"));
         colQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
@@ -103,7 +93,6 @@ public class StudentCartController {
         colPrice.setCellFactory(c -> moneyCell());
         colLine.setCellFactory(c -> moneyCell());
 
-        // ==== (3) XÓA ====
         colRemove.setCellFactory(c -> new TableCell<>() {
             private final Button btn = new Button("🗑");
             {
@@ -119,10 +108,8 @@ public class StudentCartController {
             }
         });
 
-        // ✅ QUAN TRỌNG: dùng UNCONSTRAINED để cột không tự co về 0
         cartTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
-        // set width rõ ràng (không bind %, không maxWidth lạ)
         colImg.setPrefWidth(110);   colImg.setMinWidth(110);
         colCourse.setPrefWidth(420);colCourse.setMinWidth(420);
         colQty.setPrefWidth(80);    colQty.setMinWidth(80);
@@ -130,7 +117,6 @@ public class StudentCartController {
         colLine.setPrefWidth(160);  colLine.setMinWidth(160);
         colRemove.setPrefWidth(70); colRemove.setMinWidth(70);
 
-        // canh text cho đẹp
         colImg.setStyle("-fx-alignment: CENTER;");
         colQty.setStyle("-fx-alignment: CENTER;");
         colPrice.setStyle("-fx-alignment: CENTER-RIGHT;");
@@ -143,24 +129,14 @@ public class StudentCartController {
         reload();
     }
 
-
     private Image loadImage(String url) {
-        // url có thể là:
-        // - "Java.png"
-        // - "/images/Java.png"
-        // - "https://..."
-        if (url.startsWith("http://") || url.startsWith("https://")) {
-            return new Image(url, true);
-        }
+        if (url.startsWith("http://") || url.startsWith("https://")) return new Image(url, true);
         if (url.startsWith("/")) {
             var is = getClass().getResourceAsStream(url);
             if (is != null) return new Image(is);
         }
-        // fallback: coi như tên file trong /images/
         var is2 = getClass().getResourceAsStream("/images/" + url);
         if (is2 != null) return new Image(is2);
-
-        // nếu vẫn không thấy -> trả ảnh null (để cell trống)
         throw new RuntimeException("Không load được ảnh: " + url);
     }
 
@@ -181,28 +157,25 @@ public class StudentCartController {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Long sid = CurrentUser.getCurrentAccount().getId();
 
-            Cart cart = session.createQuery("FROM Cart c WHERE c.student.id = :sid", Cart.class)
+            Cart cart = session.createQuery("from Cart c where c.student.id = :sid", Cart.class)
                     .setParameter("sid", sid)
                     .uniqueResult();
 
-            if (cart == null) {
-                totalLabel.setText("0 VNĐ");
-                return;
-            }
+            if (cart == null) { totalLabel.setText("0 VNĐ"); return; }
 
             List<CartItem> items = session.createQuery(
-                            "FROM CartItem ci WHERE ci.cart.id = :cid", CartItem.class)
+                            "from CartItem ci where ci.cart.id = :cid", CartItem.class)
                     .setParameter("cid", cart.getId())
                     .list();
 
             for (CartItem ci : items) {
                 String name = (ci.getCourse() != null ? ci.getCourse().getName() : "Course");
-                String img = (ci.getCourse() != null ? ci.getCourse().getImageUrl() : null); // ✅ lấy image_url từ course
+                String img = (ci.getCourse() != null ? ci.getCourse().getImageUrl() : null);
                 int q = ci.getQuantity() == null ? 0 : ci.getQuantity();
                 BigDecimal price = ci.getPriceAtAdd() == null ? BigDecimal.ZERO : ci.getPriceAtAdd();
 
                 if (q > 0) {
-                    data.add(new CartRow(ci.getId(), name, img, q, price)); // ✅ truyền img vào đây
+                    data.add(new CartRow(ci.getId(), name, img, q, price));
                     total = total.add(price.multiply(BigDecimal.valueOf(q)));
                 }
             }
@@ -225,12 +198,10 @@ public class StudentCartController {
 
             tx.commit();
 
-            // ✅ cập nhật badge menu giỏ hàng
             StudentDashboardController.requestCartBadgeRefresh();
-
             reload();
         } catch (Exception e) {
-            if (tx != null && tx.isActive()) tx.rollback();
+            try { if (tx != null && tx.isActive()) tx.rollback(); } catch (Exception ignore) {}
             e.printStackTrace();
             alert(Alert.AlertType.ERROR, "Lỗi", "Không xóa được: " + e.getMessage());
         }
@@ -240,17 +211,17 @@ public class StudentCartController {
     private void checkout() {
         try {
             Long sid = CurrentUser.getCurrentAccount().getId();
+
             OrderService orderService = new OrderService();
             var order = orderService.checkout(sid);
 
-            alert(Alert.AlertType.INFORMATION, "Thành công",
-                    "Checkout OK!\nMã đơn: " + order.getId() +
-                            "\nTổng tiền: " + vnd.format(order.getTotalAmount()) + " VNĐ");
+            // ✅ mở payment và auto chọn đúng order
+            StudentDashboardController.openPaymentAfterCheckout(order.getId());
 
-            // ✅ checkout xong giỏ trống -> cập nhật badge về 0
+            // ✅ cập nhật badge + reload giỏ
             StudentDashboardController.requestCartBadgeRefresh();
-
             reload();
+
         } catch (Exception e) {
             e.printStackTrace();
             alert(Alert.AlertType.ERROR, "Lỗi", e.getMessage());
@@ -259,8 +230,6 @@ public class StudentCartController {
 
     @FXML
     private void clearCart() {
-
-        // ✅ hỏi xác nhận
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Xác nhận");
         confirm.setHeaderText("Xóa tất cả khóa học trong giỏ?");
@@ -271,9 +240,8 @@ public class StudentCartController {
         confirm.getButtonTypes().setAll(btnYes, btnNo);
 
         var result = confirm.showAndWait();
-        if (result.isEmpty() || result.get() != btnYes) return; // bấm Hủy thì thôi
+        if (result.isEmpty() || result.get() != btnYes) return;
 
-        // ✅ xóa DB
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Long sid = CurrentUser.getCurrentAccount().getId();
@@ -288,17 +256,14 @@ public class StudentCartController {
 
             alert(Alert.AlertType.INFORMATION, "OK", "Đã xóa " + deleted + " khóa học trong giỏ.");
             reload();
-
-            // nếu bạn có badge giỏ hàng
             StudentDashboardController.requestCartBadgeRefresh();
 
         } catch (Exception e) {
-            if (tx != null && tx.isActive()) tx.rollback();
+            try { if (tx != null && tx.isActive()) tx.rollback(); } catch (Exception ignore) {}
             e.printStackTrace();
             alert(Alert.AlertType.ERROR, "Lỗi", "Không xóa được giỏ hàng: " + e.getMessage());
         }
     }
-
 
     private void alert(Alert.AlertType type, String title, String msg) {
         Alert a = new Alert(type);

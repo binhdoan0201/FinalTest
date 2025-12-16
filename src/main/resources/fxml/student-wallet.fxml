@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ucop.edu.controller.StudentWalletController"
+            style="-fx-background-color: white;">
+
+    <top>
+        <VBox spacing="10" style="-fx-background-color:#ffffff;">
+            <padding><Insets top="14" right="16" bottom="14" left="16"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="👛 Ví của tôi" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Số dư:" style="-fx-font-weight:bold;"/>
+                <Label fx:id="lblBalance" text="0 VNĐ" style="-fx-text-fill:#16a34a; -fx-font-weight:bold; -fx-font-size:16px;"/>
+            </HBox>
+
+            <Label fx:id="lblMsg" text="" style="-fx-text-fill:#2563eb; -fx-font-weight:bold;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="12">
+            <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+
+            <HBox spacing="10" alignment="CENTER_LEFT"
+                  style="-fx-background-color:#f8fafc; -fx-border-color:#e2e8f0; -fx-border-radius:12; -fx-background-radius:12;">
+                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+
+                <Label text="Số tiền nạp:" style="-fx-font-weight:bold;"/>
+                <TextField fx:id="txtTopupAmount" promptText="VD: 100000" prefWidth="240"/>
+
+                <Button text="➕ Nạp ví" onAction="#handleTopup"
+                        style="-fx-background-color:#22c55e; -fx-text-fill:white; -fx-font-weight:bold; -fx-background-radius:10; -fx-padding:8 14;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="⟲ Làm mới" onAction="#handleRefresh"
+                        style="-fx-background-color:#e5e7eb; -fx-text-fill:#111827; -fx-font-weight:bold; -fx-background-radius:10; -fx-padding:8 14;"/>
+            </HBox>
+
+            <Label text="🧾 Lịch sử giao dịch ví" style="-fx-font-weight:bold;"/>
+
+            <TableView fx:id="tblTx" VBox.vgrow="ALWAYS"
+                       style="-fx-background-radius: 12; -fx-border-radius:12; -fx-border-color:#e2e8f0;">
+                <columns>
+                    <TableColumn fx:id="colTime" text="Thời gian" prefWidth="200"/>
+                    <TableColumn fx:id="colType" text="Loại" prefWidth="120"/>
+                    <TableColumn fx:id="colAmount" text="Số tiền" prefWidth="160"/>
+                    <TableColumn fx:id="colNote" text="Ghi chú" prefWidth="520"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

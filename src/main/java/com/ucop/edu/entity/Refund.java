@@ -14,7 +14,7 @@ public class Refund {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // DB: refunds.payment_id -> payments.id
+    // DB: refunds.payment_id -> payments.id (nullable)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
     private Payment payment;
@@ -22,12 +22,12 @@ public class Refund {
     @Column(name = "amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal amount = BigDecimal.ZERO;
 
-    @Lob
-    @Column(name = "reason")
+    // Nếu DB là nvarchar(max) thì ok; nếu DB là nvarchar(500) thì đổi length=500 và bỏ Lob
+    @Column(name = "reason", columnDefinition = "nvarchar(max)")
     private String reason;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 20)
+    @Column(name = "status", length = 20, nullable = false)
     private RefundStatus status = RefundStatus.REQUESTED;
 
     @Column(name = "processed_at")
@@ -39,8 +39,25 @@ public class Refund {
     public void prePersist() {
         if (status == null) status = RefundStatus.REQUESTED;
         if (amount == null) amount = BigDecimal.ZERO;
+
+        // nếu tạo mới mà đã PROCESSED thì set luôn
+        if (processedAt == null && status == RefundStatus.PROCESSED) {
+            processedAt = LocalDateTime.now();
+        }
     }
 
+    @PreUpdate
+    public void preUpdate() {
+        if (status == null) status = RefundStatus.REQUESTED;
+        if (amount == null) amount = BigDecimal.ZERO;
+
+        // ✅ Fix lỗi phổ biến: update status sang PROCESSED nhưng processedAt vẫn null
+        if (processedAt == null && status == RefundStatus.PROCESSED) {
+            processedAt = LocalDateTime.now();
+        }
+    }
+
+    // ===== getters/setters =====
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -56,7 +73,9 @@ public class Refund {
     public void setReason(String reason) { this.reason = reason; }
 
     public RefundStatus getStatus() { return status; }
-    public void setStatus(RefundStatus status) { this.status = status; }
+    public void setStatus(RefundStatus status) {
+        this.status = (status == null ? RefundStatus.REQUESTED : status);
+    }
 
     public LocalDateTime getProcessedAt() { return processedAt; }
     public void setProcessedAt(LocalDateTime processedAt) { this.processedAt = processedAt; }

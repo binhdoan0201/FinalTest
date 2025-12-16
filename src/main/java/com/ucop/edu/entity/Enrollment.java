@@ -21,7 +21,7 @@ public class Enrollment {
     private String enrollmentCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id") // DB đang cho phép NULL
+    @JoinColumn(name = "student_id")
     private Account student;
 
     @Enumerated(EnumType.STRING)
@@ -64,10 +64,6 @@ public class Enrollment {
             cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Appointment> appointments = new HashSet<>();
 
-    @OneToMany(mappedBy = "enrollment", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Payment> payments = new HashSet<>();
-
     public Enrollment() {}
 
     // ================= LIFECYCLE =================
@@ -104,11 +100,10 @@ public class Enrollment {
     private void ensureBidirectionalLinks() {
         if (items != null) for (EnrollmentItem it : items) if (it != null) it.setEnrollment(this);
         if (appointments != null) for (Appointment ap : appointments) if (ap != null) ap.setEnrollment(this);
-        if (payments != null) for (Payment p : payments) if (p != null) p.setEnrollment(this);
+        // ❌ bỏ payments vì Payment đã link theo Order
     }
 
     // ================= BUSINESS =================
-    /** Tính subtotal từ items; total = subtotal - discount + tax + shipping */
     public void recalculateTotals() {
         BigDecimal sub = BigDecimal.ZERO;
 
@@ -120,7 +115,6 @@ public class Enrollment {
                 if (totalPrice != null) {
                     sub = sub.add(totalPrice);
                 } else {
-                    // fallback nếu EnrollmentItem chưa set totalPrice
                     BigDecimal unit = it.getUnitPrice() == null ? BigDecimal.ZERO : it.getUnitPrice();
                     Integer qty = it.getQuantity() == null ? 0 : it.getQuantity();
                     BigDecimal itemDiscount = it.getDiscountItemDiscount() == null ? BigDecimal.ZERO : it.getDiscountItemDiscount();
@@ -144,7 +138,6 @@ public class Enrollment {
         totalAmount = total;
     }
 
-    /** Số tiền còn phải trả */
     public BigDecimal getAmountDue() {
         BigDecimal total = totalAmount == null ? BigDecimal.ZERO : totalAmount;
         BigDecimal paid = paidAmount == null ? BigDecimal.ZERO : paidAmount;
@@ -179,18 +172,6 @@ public class Enrollment {
         ap.setEnrollment(null);
     }
 
-    public void addPayment(Payment p) {
-        if (p == null) return;
-        payments.add(p);
-        p.setEnrollment(this);
-    }
-
-    public void removePayment(Payment p) {
-        if (p == null) return;
-        payments.remove(p);
-        p.setEnrollment(null);
-    }
-
     // ================= GETTER / SETTER =================
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -206,7 +187,6 @@ public class Enrollment {
         this.status = (status == null) ? EnrollmentStatus.CART : status;
     }
 
-    /** ✅ Cho bạn gọi setStatus("PAID") từ code UI */
     public void setStatus(String status) {
         if (status == null || status.isBlank()) {
             this.status = EnrollmentStatus.CART;
@@ -259,13 +239,6 @@ public class Enrollment {
         ensureBidirectionalLinks();
     }
 
-    public Set<Payment> getPayments() { return payments; }
-    public void setPayments(Set<Payment> payments) {
-        this.payments = (payments == null) ? new HashSet<>() : payments;
-        ensureBidirectionalLinks();
-    }
-
-    // ================= equals/hashCode =================
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

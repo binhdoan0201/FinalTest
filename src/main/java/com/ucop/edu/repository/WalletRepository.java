@@ -8,24 +8,21 @@ import java.math.BigDecimal;
 
 public class WalletRepository {
 
-    public Wallets findByAccountId(Long accountId, Session s) {
-        return s.createQuery(
-                "select w from Wallet w where w.account.id = :aid",
+    public Wallets getOrCreate(Long accountId, Session s) {
+        Wallets w = s.createQuery(
+                "select w from Wallets w join fetch w.account a where a.id = :aid",
                 Wallets.class
         ).setParameter("aid", accountId).uniqueResult();
-    }
 
-    public Wallets getOrCreate(Long accountId, Session s) {
-        Wallets w = findByAccountId(accountId, s);
-        if (w != null) return w;
+        if (w == null) {
+            Account a = s.get(Account.class, accountId);
+            if (a == null) throw new IllegalStateException("Account không tồn tại id=" + accountId);
 
-        Account acc = s.get(Account.class, accountId);
-
-        Wallets nw = new Wallets();
-        nw.setAccount(acc);
-        nw.setBalance(BigDecimal.ZERO);
-
-        s.persist(nw);
-        return nw;
+            w = new Wallets();
+            w.setAccount(a);
+            w.setBalance(BigDecimal.ZERO);
+            s.persist(w); // sau dòng này w là managed
+        }
+        return w;
     }
 }

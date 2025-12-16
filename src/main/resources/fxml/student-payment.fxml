@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ucop.edu.controller.StudentPaymentController"
+            style="-fx-background-color: white;">
+
+    <top>
+        <VBox spacing="10" style="-fx-background-color:#ffffff;">
+            <padding><Insets top="14" right="16" bottom="10" left="16"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="💳 Thanh toán" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Ví:" style="-fx-font-weight: bold;"/>
+                <Label fx:id="lblWalletTop" text="0 VNĐ" style="-fx-text-fill:#16a34a; -fx-font-weight:bold;"/>
+            </HBox>
+
+            <Label fx:id="lblMsg" text="" style="-fx-font-weight:bold;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="14">
+            <padding><Insets top="10" right="16" bottom="16" left="16"/></padding>
+
+            <!-- Card chọn đơn -->
+            <VBox spacing="10"
+                  style="-fx-background-color:#f8fafc; -fx-border-color:#e2e8f0; -fx-border-radius:14; -fx-background-radius:14;">
+                <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Chọn đơn:" style="-fx-font-weight:bold;"/>
+                    <ComboBox fx:id="cbOrder" promptText="Chọn đơn hàng cần thanh toán..." prefWidth="520"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="⟲ Làm mới" onAction="#handleRefresh"
+                            style="-fx-background-color:#e5e7eb; -fx-font-weight:bold; -fx-background-radius:10; -fx-padding:8 14;"/>
+                </HBox>
+
+                <HBox spacing="22">
+                    <VBox>
+                        <Label text="Tổng tiền" style="-fx-text-fill:#64748b;"/>
+                        <Label fx:id="lblTotal" text="0 VNĐ" style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+                    </VBox>
+                    <VBox>
+                        <Label text="Đã trả" style="-fx-text-fill:#64748b;"/>
+                        <Label fx:id="lblPaid" text="0 VNĐ" style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+                    </VBox>
+                    <VBox>
+                        <Label text="Còn phải trả" style="-fx-text-fill:#64748b;"/>
+                        <Label fx:id="lblDue" text="0 VNĐ" style="-fx-font-size:16px; -fx-font-weight:bold; -fx-text-fill:#ef4444;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Card thao tác thanh toán -->
+            <VBox spacing="10"
+                  style="-fx-background-color:#ffffff; -fx-border-color:#e2e8f0; -fx-border-radius:14; -fx-background-radius:14;">
+                <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+
+                <GridPane hgap="12" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints prefWidth="120"/>
+                        <ColumnConstraints prefWidth="220"/>
+                        <ColumnConstraints prefWidth="90"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints prefWidth="120"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+
+                    <Label text="Phương thức:" style="-fx-font-weight:bold;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="cbMethod" prefWidth="200" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                    <Label text="Số tiền:" style="-fx-font-weight:bold;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                    <TextField fx:id="txtAmount" promptText="Để trống = trả hết phần còn lại"
+                               GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                    <Label text="TransactionId:" style="-fx-font-weight:bold;" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
+                    <TextField fx:id="txtTransactionId" promptText="Để trống sẽ tự sinh"
+                               GridPane.rowIndex="0" GridPane.columnIndex="5"/>
+
+                </GridPane>
+
+                <HBox alignment="CENTER_RIGHT">
+                    <Button text="✔ Thanh toán" onAction="#handlePay"
+                            style="-fx-background-color:#2563eb; -fx-text-fill:white; -fx-font-weight:bold; -fx-background-radius:10; -fx-padding:10 16;"/>
+                </HBox>
+            </VBox>
+
+            <Label text="🧾 Lịch sử thanh toán" style="-fx-font-weight:bold;"/>
+
+            <TableView fx:id="tblPayments" VBox.vgrow="ALWAYS"
+                       style="-fx-background-radius: 12; -fx-border-radius:12; -fx-border-color:#e2e8f0;">
+                <columns>
+                    <TableColumn fx:id="colPayId" text="Mã" prefWidth="80"/>
+                    <TableColumn fx:id="colOrderId" text="Mã đơn" prefWidth="120"/>
+                    <TableColumn fx:id="colPayAmount" text="Số tiền" prefWidth="160"/>
+                    <TableColumn fx:id="colPayMethod" text="Phương thức" prefWidth="140"/>
+                    <TableColumn fx:id="colPayStatus" text="Trạng thái" prefWidth="120"/>
+                    <TableColumn fx:id="colPayAt" text="Thời gian" prefWidth="220"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+</BorderPane>

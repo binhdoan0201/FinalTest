@@ -3,9 +3,8 @@ package com.ucop.edu.service.impl;
 import com.ucop.edu.entity.*;
 import com.ucop.edu.entity.enums.PaymentMethod;
 import com.ucop.edu.entity.enums.PaymentStatus;
-import com.ucop.edu.entity.enums.RefundStatus;
+import com.ucop.edu.entity.enums.WalletTxType;
 import com.ucop.edu.repository.PaymentRepository;
-import com.ucop.edu.repository.RefundRepository;
 import com.ucop.edu.repository.WalletRepository;
 import com.ucop.edu.util.HibernateUtil;
 import org.hibernate.Session;
@@ -17,167 +16,90 @@ import java.util.UUID;
 
 public class PaymentService {
 
-    private final PaymentRepository paymentRepo = new PaymentRepository();
-    private final RefundRepository refundRepo = new RefundRepository();
     private final WalletRepository walletRepo = new WalletRepository();
+    private final PaymentRepository paymentRepo = new PaymentRepository();
 
-    public void createPayment(Long enrollmentId,
-                              BigDecimal amount,
-                              PaymentMethod method,
-                              PaymentStatus status,
-                              String transactionId) {
+    public Payment payOrder(Long studentId,
+                            Long orderId,
+                            BigDecimal amount,
+                            PaymentMethod method,
+                            String transactionIdOrNull) {
 
         Transaction tx = null;
+
         try (Session s = HibernateUtil.getSessionFactory().openSession()) {
             tx = s.beginTransaction();
 
-            Enrollment e = s.get(Enrollment.class, enrollmentId);
-            if (e == null) throw new IllegalStateException("Enrollment không tồn tại");
+            Order order = s.get(Order.class, orderId);
+            if (order == null) throw new IllegalStateException("Không tìm thấy Order id=" + orderId);
+            if (order.getStudent() == null || order.getStudent().getId() == null
+                    || !order.getStudent().getId().equals(studentId)) {
+                throw new IllegalStateException("Order không thuộc về bạn.");
+            }
 
+            BigDecimal total = nvl(order.getTotalAmount());
+            BigDecimal paid = paymentRepo.sumPaidByOrder(s, orderId);
+            BigDecimal due  = total.subtract(paid);
+            if (due.signum() <= 0) throw new IllegalStateException("Đơn này đã thanh toán đủ.");
+
+            if (amount == null || amount.signum() <= 0) amount = due; // để trống = trả hết
+            if (amount.compareTo(due) > 0) throw new IllegalStateException("Số tiền vượt quá phần còn lại cần trả.");
+
+            // WALLET
+            Account student = s.get(Account.class, studentId);
+            Wallets w = walletRepo.getOrCreate(studentId, s);
+
+            // trừ ví
+            w.sub(amount);
+            s.merge(w);
+
+            // log transaction (✅ set object wallet + account, KHÔNG set id)
+            WalletTransaction txw = new WalletTransaction();
+            txw.setAccount(student);
+            txw.setWallet(w);
+            txw.setOrderId(orderId); // ✅ DB bạn có order_id
+            txw.setType(WalletTxType.PAYMENT_DEBIT);
+            txw.setAmount(amount);
+            txw.setBalanceAfter(w.getBalance());
+            txw.setMessage("Thanh toán đơn #" + orderId);
+            txw.setCreatedAt(LocalDateTime.now());
+            s.persist(txw);
+
+
+
+
+            // create payment
             Payment p = new Payment();
-            p.setEnrollment(e);
+            p.setOrder(order);
             p.setAmount(amount);
             p.setPaymentMethod(method);
-            p.setStatus(status == null ? PaymentStatus.PENDING : status);
-            p.setTransactionId((transactionId == null || transactionId.isBlank())
-                    ? genTxId()
-                    : transactionId.trim());
-            p.setCreatedAt(LocalDateTime.now());
-
-            if (p.getStatus() == PaymentStatus.PAID) {
-                p.setPaidAt(LocalDateTime.now());
-                applyPaidEffects(s, e, p);
-            }
-
-            s.persist(p);
-            tx.commit();
-        } catch (Exception ex) {
-            if (tx != null) tx.rollback();
-            throw ex;
-        }
-    }
-
-    public void markPaid(Long paymentId) {
-        Transaction tx = null;
-        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
-            tx = s.beginTransaction();
-
-            Payment p = paymentRepo.findByIdWithEnrollmentStudent(paymentId, s);
-            if (p == null) throw new IllegalStateException("Payment không tồn tại");
-            if (p.getStatus() == PaymentStatus.PAID) throw new IllegalStateException("Payment đã PAID");
-
-            Enrollment e = s.get(Enrollment.class, p.getEnrollment().getId());
-
             p.setStatus(PaymentStatus.PAID);
+
+            String txId = (transactionIdOrNull == null || transactionIdOrNull.trim().isEmpty())
+                    ? ("TX-" + UUID.randomUUID())
+                    : transactionIdOrNull.trim();
+            p.setTransactionId(txId);
             p.setPaidAt(LocalDateTime.now());
 
-            applyPaidEffects(s, e, p);
+            s.persist(p);
 
-            s.merge(p);
-            tx.commit();
-        } catch (Exception ex) {
-            if (tx != null) tx.rollback();
-            throw ex;
-        }
-    }
-
-    public void requestRefund(Long paymentId, BigDecimal amount, String reason) {
-        Transaction tx = null;
-        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
-            tx = s.beginTransaction();
-
-            Payment p = paymentRepo.findById(paymentId, s);
-            if (p == null) throw new IllegalStateException("Payment không tồn tại");
-
-            if (amount.compareTo(p.getAmount()) > 0)
-                throw new IllegalStateException("Refund > amount payment");
-
-            Refund r = new Refund();
-            r.setPayment(p);
-            r.setAmount(amount);
-            r.setReason(reason);
-            r.setStatus(RefundStatus.REQUESTED);
-
-            s.persist(r);
-            tx.commit();
-        } catch (Exception ex) {
-            if (tx != null) tx.rollback();
-            throw ex;
-        }
-    }
-
-    public void processRefund(Long refundId) {
-        Transaction tx = null;
-        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
-            tx = s.beginTransaction();
-
-            Refund r = refundRepo.findById(refundId, s);
-            if (r == null) throw new IllegalStateException("Refund không tồn tại");
-            if (r.getStatus() == RefundStatus.PROCESSED)
-                throw new IllegalStateException("Refund đã PROCESSED");
-
-            Payment p = paymentRepo.findByIdWithEnrollmentStudent(r.getPayment().getId(), s);
-            Enrollment e = s.get(Enrollment.class, p.getEnrollment().getId());
-
-            // WALLET: cộng lại ví
-            if (p.getPaymentMethod() == PaymentMethod.WALLET && e.getStudent() != null) {
-                Wallets w = walletRepo.getOrCreate(e.getStudent().getId(), s);
-                w.setBalance(w.getBalance().add(r.getAmount()));
-                s.merge(w);
+            // update order status
+            BigDecimal newPaid = paid.add(amount);
+            if (newPaid.compareTo(total) >= 0) {
+                order.setStatus("PAID");
+            } else {
+                order.setStatus("PENDING_PAYMENT");
             }
-
-            // trừ paid_amount
-            BigDecimal paid = (e.getPaidAmount() == null ? BigDecimal.ZERO : e.getPaidAmount());
-            e.setPaidAmount(paid.subtract(r.getAmount()));
-            if (e.getPaidAmount().signum() < 0) e.setPaidAmount(BigDecimal.ZERO);
-            e.setUpdatedAt(LocalDateTime.now());
-            e.setStatus("RMA_REQUESTED"); // hoặc "REFUNDED" tuỳ bạn
-
-            // update status payment/refund
-            r.setStatus(RefundStatus.PROCESSED);
-            r.setProcessedAt(LocalDateTime.now());
-
-            p.setStatus(PaymentStatus.REFUNDED);
-
-            s.merge(e);
-            s.merge(p);
-            s.merge(r);
+            s.merge(order);
 
             tx.commit();
-        } catch (Exception ex) {
-            if (tx != null) tx.rollback();
-            throw ex;
+            return p;
+
+        } catch (Exception e) {
+            try { if (tx != null && tx.isActive()) tx.rollback(); } catch (Exception ignore) {}
+            throw new RuntimeException("Thanh toán thất bại: " + e.getMessage(), e);
         }
     }
 
-    // ===================== PRIVATE =====================
-    private String genTxId() {
-        return "TX-" + UUID.randomUUID().toString().substring(0, 10).toUpperCase();
-    }
-
-    // Khi PAID: tăng paid_amount + trừ wallet nếu WALLET
-    private void applyPaidEffects(Session s, Enrollment e, Payment p) {
-        if (e == null) return;
-
-        BigDecimal paid = (e.getPaidAmount() == null ? BigDecimal.ZERO : e.getPaidAmount());
-        BigDecimal total = (e.getTotalAmount() == null ? BigDecimal.ZERO : e.getTotalAmount());
-
-        e.setPaidAmount(paid.add(p.getAmount()));
-        e.setUpdatedAt(LocalDateTime.now());
-
-        if (e.getPaidAmount().compareTo(total) >= 0) e.setStatus("PAID");
-        else e.setStatus("PENDING_PAYMENT");
-
-        // WALLET: trừ ví
-        if (p.getPaymentMethod() == PaymentMethod.WALLET && e.getStudent() != null) {
-            Wallets w = walletRepo.getOrCreate(e.getStudent().getId(), s);
-            if (w.getBalance().compareTo(p.getAmount()) < 0) {
-                throw new IllegalStateException("Ví không đủ tiền");
-            }
-            w.setBalance(w.getBalance().subtract(p.getAmount()));
-            s.merge(w);
-        }
-
-        s.merge(e);
-    }
+    private BigDecimal nvl(BigDecimal x) { return x == null ? BigDecimal.ZERO : x; }
 }

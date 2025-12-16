@@ -1,9 +1,7 @@
 package com.ucop.edu.entity.enums;
 
 public enum RefundStatus {
-    REQUESTED,
-    APPROVED,
-    REJECTED,
+    PENDING,
     PROCESSED,
-    CANCELED
+    FAILED, APPROVED, REJECTED, REQUESTED
 }

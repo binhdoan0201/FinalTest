@@ -6,8 +6,6 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "payments")
@@ -17,21 +15,21 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // DB: payments.enrollment_id -> enrollments.id
+    // ✅ liên kết order
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "enrollment_id")
-    private Enrollment enrollment;
+    @JoinColumn(name = "order_id")
+    private Order order;
 
-    @Column(name = "amount", nullable = false, precision = 12, scale = 2)
+    @Column(name = "amount", precision = 18, scale = 2, nullable = false)
     private BigDecimal amount = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method", length = 30)
+    @Column(name = "payment_method", length = 30, nullable = false)
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 20)
-    private PaymentStatus status = PaymentStatus.PENDING;
+    @Column(name = "status", length = 30, nullable = false)
+    private PaymentStatus status = PaymentStatus.PAID;
 
     @Column(name = "transaction_id", length = 100)
     private String transactionId;
@@ -39,43 +37,20 @@ public class Payment {
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Refund> refunds = new HashSet<>();
-
-    public Payment() {}
-
     @PrePersist
     public void prePersist() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-        if (status == null) status = PaymentStatus.PENDING;
+        if (paidAt == null) paidAt = LocalDateTime.now();
         if (amount == null) amount = BigDecimal.ZERO;
+        if (status == null) status = PaymentStatus.PAID;
     }
 
-    // ===== helper 2 chiều
-    public void addRefund(Refund r) {
-        refunds.add(r);
-        r.setPayment(this);
-    }
-    public void removeRefund(Refund r) {
-        refunds.remove(r);
-        r.setPayment(null);
-    }
-
-    // ===== getter/setter
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
-    public Enrollment getEnrollment() { return enrollment; }
-    public void setEnrollment(Enrollment enrollment) { this.enrollment = enrollment; }
+    public Order getOrder() { return order; }
+    public void setOrder(Order order) { this.order = order; }
 
     public BigDecimal getAmount() { return amount; }
-    public void setAmount(BigDecimal amount) {
-        this.amount = (amount == null ? BigDecimal.ZERO : amount);
-    }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
 
     public PaymentMethod getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
@@ -88,12 +63,4 @@ public class Payment {
 
     public LocalDateTime getPaidAt() { return paidAt; }
     public void setPaidAt(LocalDateTime paidAt) { this.paidAt = paidAt; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public Set<Refund> getRefunds() { return refunds; }
-    public void setRefunds(Set<Refund> refunds) {
-        this.refunds = (refunds == null ? new HashSet<>() : refunds);
-    }
 }

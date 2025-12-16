@@ -34,7 +34,8 @@
                            -fx-text-fill: white;
                            -fx-border-radius: 8;
                            -fx-background-radius: 8;
-                           -fx-padding: 8 14;"/>
+                           -fx-padding: 8 14;
+                           -fx-cursor: hand;"/>
         </HBox>
     </top>
 
@@ -61,7 +62,8 @@
                            -fx-border-color: #e2e8f0;
                            -fx-background-radius: 10;
                            -fx-border-radius: 10;
-                           -fx-padding: 10 12;"/>
+                           -fx-padding: 10 12;
+                           -fx-cursor: hand;"/>
 
             <!-- Cart + Badge -->
             <Button onAction="#showCart"
@@ -69,7 +71,8 @@
                            -fx-border-color: #e2e8f0;
                            -fx-background-radius: 10;
                            -fx-border-radius: 10;
-                           -fx-padding: 10 12;">
+                           -fx-padding: 10 12;
+                           -fx-cursor: hand;">
                 <graphic>
                     <HBox spacing="8" alignment="CENTER_LEFT">
                         <Label text="🛒 Giỏ hàng"/>
@@ -86,6 +89,26 @@
                 </graphic>
             </Button>
 
+            <!-- ✅ NEW: Payment -->
+            <Button text="💳 Thanh toán"
+                    onAction="#showPayment"
+                    style="-fx-background-color: white;
+                           -fx-border-color: #e2e8f0;
+                           -fx-background-radius: 10;
+                           -fx-border-radius: 10;
+                           -fx-padding: 10 12;
+                           -fx-cursor: hand;"/>
+
+            <!-- ✅ NEW: Wallet -->
+            <Button text="👛 Ví của tôi"
+                    onAction="#showWallet"
+                    style="-fx-background-color: white;
+                           -fx-border-color: #e2e8f0;
+                           -fx-background-radius: 10;
+                           -fx-border-radius: 10;
+                           -fx-padding: 10 12;
+                           -fx-cursor: hand;"/>
+
             <!-- Orders -->
             <Button text="🧾 Đơn hàng của tôi"
                     onAction="#showOrders"
@@ -93,12 +116,22 @@
                            -fx-border-color: #e2e8f0;
                            -fx-background-radius: 10;
                            -fx-border-radius: 10;
-                           -fx-padding: 10 12;"/>
+                           -fx-padding: 10 12;
+                           -fx-cursor: hand;"/>
 
-            <!-- ĐẨY FOOTER XUỐNG ĐÁY -->
-            <Region VBox.vgrow="ALWAYS"/>
+            <!-- ✅ NEW: Return/Refund Request -->
+            <Button text="← Hoàn tiền / Hoàn đổi"
+                    onAction="#showReturnRequests"
+                    style="-fx-background-color: white;
+                           -fx-border-color: #e2e8f0;
+                           -fx-background-radius: 10;
+                           -fx-border-radius: 10;
+                           -fx-padding: 10 12;
+                           -fx-cursor: hand;"/>
+            
+            		<Region VBox.vgrow="ALWAYS"/>
 
-            <!-- ================= FOOTER TIP ================= -->
+            <!-- Footer tip -->
             <HBox style="-fx-background-color: #f8fafc;
                          -fx-border-color: #e2e8f0;
                          -fx-border-width: 1 0 0 0;

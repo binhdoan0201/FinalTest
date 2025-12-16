@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ucop.edu.controller.StudentReturnRequestController"
+            style="-fx-background-color: #eef2f7;">
+
+    <children>
+        <VBox spacing="16"
+              AnchorPane.topAnchor="18" AnchorPane.leftAnchor="18"
+              AnchorPane.rightAnchor="18" AnchorPane.bottomAnchor="18">
+
+            <HBox alignment="CENTER_LEFT">
+                <Label text="🐧 Yêu cầu hoàn tiền / hoàn đổi"
+                       style="-fx-text-fill:#0f172a; -fx-font-weight: 800;">
+                    <font><Font size="22"/></font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="↻ Làm mới" onAction="#handleRefresh"
+                        style="-fx-background-color: #e5e7eb;
+                               -fx-text-fill: #111827;
+                               -fx-background-radius: 10;
+                               -fx-padding: 8 14;
+                               -fx-font-weight: 700;
+                               -fx-cursor: hand;"/>
+            </HBox>
+
+            <Label fx:id="lblMsg" text="" wrapText="true"
+                   style="-fx-font-weight:700;"/>
+
+            <VBox spacing="12"
+                  style="-fx-background-color: white;
+                         -fx-background-radius: 14;
+                         -fx-padding: 18;
+                         -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.10), 12, 0, 0, 2);">
+
+                <GridPane hgap="14" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="170" prefWidth="200"/>
+                        <ColumnConstraints minWidth="320" prefWidth="420"/>
+                        <ColumnConstraints minWidth="120" prefWidth="140"/>
+                        <ColumnConstraints minWidth="180" prefWidth="220"/>
+                    </columnConstraints>
+
+                    <Label text="Chọn đơn (Order):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="cbOrder" prefWidth="420"
+                              GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                    <Label text="Loại yêu cầu:" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                    <ComboBox fx:id="cbType" prefWidth="180"
+                              GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                    <Label text="Số tiền hoàn (không bắt buộc):" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="txtAmount" promptText="Để trống = FULL/AUTO"
+                               GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+
+                    <Label text="Lý do:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <TextArea fx:id="txtReason" prefRowCount="2"
+                              promptText="Lý do hoàn tiền/đổi khóa..."
+                              GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+                </GridPane>
+
+                <HBox alignment="CENTER_RIGHT">
+                    <Button text="Gửi yêu cầu" onAction="#handleSubmit"
+                            style="-fx-background-color:#2563eb;
+                                   -fx-text-fill:white;
+                                   -fx-background-radius:10;
+                                   -fx-padding: 9 18;
+                                   -fx-font-weight: 800;
+                                   -fx-cursor: hand;"/>
+                </HBox>
+            </VBox>
+
+            <Label text="📌 Lịch sử yêu cầu của bạn"
+                   style="-fx-text-fill:#0f172a; -fx-font-weight: 800;">
+                <font><Font size="16"/></font>
+            </Label>
+
+            <TableView fx:id="tblRequests"
+                       prefHeight="420"
+                       columnResizePolicy="CONSTRAINED_RESIZE_POLICY"
+                       style="-fx-background-color: white;
+                              -fx-background-radius: 14;
+                              -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 2);">
+
+                <columns>
+                    <TableColumn fx:id="colId" text="Mã yêu cầu" prefWidth="90"/>
+                    <TableColumn fx:id="colOrderCode" text="Mã đơn" prefWidth="120"/>
+                    <TableColumn fx:id="colType" text="Loại" prefWidth="110"/>
+                    <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="150"/>
+                    <TableColumn fx:id="colAmount" text="Số tiền hoàn" prefWidth="160"/>
+                    <TableColumn fx:id="colCreatedAt" text="Thời gian gửi" prefWidth="190"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </children>
+</AnchorPane>
