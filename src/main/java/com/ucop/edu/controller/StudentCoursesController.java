@@ -6,7 +6,6 @@ import com.ucop.edu.entity.Course;
 import com.ucop.edu.entity.Account;
 import com.ucop.edu.util.CurrentUser;
 import com.ucop.edu.util.HibernateUtil;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,13 +15,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import com.ucop.edu.controller.StudentDashboardController;
-
-
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class StudentCoursesController {
 
@@ -41,6 +40,23 @@ public class StudentCoursesController {
     // map courseId -> số đã đăng ký (sum quantity trong order_items)
     private Map<Long, Integer> registeredMap = new HashMap<>();
 
+    private static final Path BASE_DIR = Paths.get(System.getProperty("user.dir")).toAbsolutePath();
+
+    private String toImageUri(String storedPath) {
+        if (storedPath == null) return null;
+        String s = storedPath.trim();
+        if (s.isEmpty()) return null;
+
+        if (s.startsWith("http://") || s.startsWith("https://") || s.startsWith("file:")) return s;
+        if (s.startsWith("/")) s = s.substring(1);
+
+        Path p = Paths.get(s);
+        if (!p.isAbsolute()) p = BASE_DIR.resolve(p).normalize();
+
+        if (!Files.exists(p)) return null;
+        return p.toUri().toString();
+    }
+    
     @FXML
     private void initialize() {
 
@@ -106,14 +122,9 @@ public class StudentCoursesController {
                 if (empty || url == null || url.isBlank()) { setGraphic(null); return; }
 
                 try {
-                    Image img;
-                    if (url.startsWith("http://") || url.startsWith("https://")) {
-                        img = new Image(url, true);
-                    } else {
-                        String path = url.startsWith("/") ? url : ("/images/" + url);
-                        img = new Image(java.util.Objects.requireNonNull(getClass().getResourceAsStream(path)));
-                    }
-                    iv.setImage(img);
+                    String uri = toImageUri(url);
+                    if (uri == null) { setGraphic(null); return; }
+                    iv.setImage(new Image(uri, 80, 55, true, true, true));
                     setGraphic(iv);
                 } catch (Exception e) {
                     setGraphic(null);
@@ -140,7 +151,7 @@ public class StudentCoursesController {
 
                 try {
                     ImageView icon = new ImageView(new Image(
-                            java.util.Objects.requireNonNull(getClass().getResourceAsStream("/images/cart.png"))
+                            java.util.Objects.requireNonNull(getClass().getResourceAsStream("/static_images/cart.png"))
                     ));
                     icon.setFitWidth(18);
                     icon.setFitHeight(18);

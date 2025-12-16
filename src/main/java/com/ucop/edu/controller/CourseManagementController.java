@@ -32,8 +32,8 @@ import java.util.UUID;
 public class CourseManagementController {
 
     // ========= IMAGE STORAGE (lưu ở máy) =========
-    private static final Path APP_DATA_DIR = Paths.get(System.getProperty("user.home"), "FinalTestData");
-    private static final Path COURSE_IMG_DIR = Paths.get("src/main/resources/images");
+	private static final Path BASE_DIR = Paths.get(System.getProperty("user.dir")).toAbsolutePath();
+	private static final Path COURSE_IMG_DIR = BASE_DIR.resolve("images");
 
     // Table
     @FXML private TableView<Course> tblCourses;
@@ -220,7 +220,7 @@ public class CourseManagementController {
             Files.copy(chosen.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
 
             // ✅ lưu dạng resource path
-            String stored = "/images/" + newName;
+            String stored = "images/" + newName;
             txtImageUrl.setText(stored);
 
             // preview
@@ -240,27 +240,25 @@ public class CourseManagementController {
 
     /** Convert stored path (images/courses/xxx.jpg OR http...) to usable URI for Image() */
     private String toImageUri(String storedPath) {
+        if (storedPath == null) return null;
         String s = storedPath.trim();
+        if (s.isEmpty()) return null;
 
         if (s.startsWith("http://") || s.startsWith("https://") || s.startsWith("file:")) {
             return s;
         }
 
-        // ✅ resource path: /images/xxx.jpg
-        if (s.startsWith("/")) {
-            var url = getClass().getResource(s);
-            if (url != null) return url.toExternalForm();
+        if (s.startsWith("/")) s = s.substring(1); // support cũ
 
-            // fallback nếu resource chưa được copy sang target/classes
-            return Paths.get("src/main/resources").resolve(s.substring(1)).toUri().toString();
+        Path p = Paths.get(s);
+        if (!p.isAbsolute()) {
+            p = BASE_DIR.resolve(p).normalize(); // ✅ dùng BASE_DIR
         }
 
-        // absolute path
-        Path p = Paths.get(s);
-        if (p.isAbsolute()) return p.toUri().toString();
+        File f = p.toFile();
+        if (!f.exists()) return null;
 
-        // relative path
-        return Paths.get(s).toUri().toString();
+        return f.toURI().toString();
     }
 
     // ===================== CRUD =====================

@@ -6,14 +6,24 @@
         <property name="hibernate.connection.driver_class">
             com.microsoft.sqlserver.jdbc.SQLServerDriver
         </property>
-
+        
+		<!-- Hưng -->
+		<property name="hibernate.connection.url">
+  			jdbc:sqlserver://MSI\SQLEXPRESS:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true;instance=SQLEXPRESS
+        </property>
+        		 <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.connection.password">123</property>
+        
+        
+        <!-- Dũng 
         <property name="hibernate.connection.url">
             jdbc:sqlserver://localhost:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true;
         </property>
-
         <property name="hibernate.connection.username">admin_java</property>
         <property name="hibernate.connection.password">123456</property>
-
+		-->
+		
+		
         <!-- Hibernate config -->
         <!-- Hibernate 5.6 + SQLServer: nên dùng dialect này -->
         <property name="hibernate.dialect">org.hibernate.dialect.SQLServer2012Dialect</property>
