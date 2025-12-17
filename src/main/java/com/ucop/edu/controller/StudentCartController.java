@@ -130,15 +130,29 @@ public class StudentCartController {
     }
 
     private Image loadImage(String url) {
-        if (url.startsWith("http://") || url.startsWith("https://")) return new Image(url, true);
-        if (url.startsWith("/")) {
-            var is = getClass().getResourceAsStream(url);
-            if (is != null) return new Image(is);
+        if (url == null) throw new RuntimeException("Ảnh null");
+
+        String u = url.trim().replace("\\", "/");
+
+        if (u.startsWith("http://") || u.startsWith("https://") || u.startsWith("file:/")) {
+            return new Image(u, true);
         }
-        var is2 = getClass().getResourceAsStream("/images/" + url);
-        if (is2 != null) return new Image(is2);
+
+        // "images/abc.jpg" -> "/images/abc.jpg"
+        if (!u.startsWith("/")) u = "/" + u;
+
+        var resUrl = getClass().getResource(u);
+        if (resUrl != null) return new Image(resUrl.toExternalForm(), true);
+
+        // fallback nếu db chỉ lưu tên file
+        String fileNameOnly = u.substring(u.lastIndexOf("/") + 1);
+        var resUrl2 = getClass().getResource("/images/" + fileNameOnly);
+        if (resUrl2 != null) return new Image(resUrl2.toExternalForm(), true);
+
         throw new RuntimeException("Không load được ảnh: " + url);
     }
+
+
 
     private TableCell<CartRow, BigDecimal> moneyCell() {
         return new TableCell<>() {

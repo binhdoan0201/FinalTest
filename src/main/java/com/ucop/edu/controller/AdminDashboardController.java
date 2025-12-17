@@ -19,10 +19,12 @@ public class AdminDashboardController {
         String name = "ADMIN";
 
         if (acc != null) {
-            if (acc.getProfile() != null && acc.getProfile().getFullName() != null && !acc.getProfile().getFullName().trim().isEmpty()) {
+            if (acc.getProfile() != null
+                    && acc.getProfile().getFullName() != null
+                    && !acc.getProfile().getFullName().trim().isEmpty()) {
                 name = acc.getProfile().getFullName();
             } else {
-                name = acc.getUsername(); // dùng username nếu chưa có họ tên
+                name = acc.getUsername();
             }
         }
 
@@ -33,17 +35,24 @@ public class AdminDashboardController {
     private void openUserManagement() throws Exception {
         loadScene("/fxml/admin-user-list.fxml");
     }
-    
+
     @FXML
     private void openCourseManagement() throws Exception {
-    	Parent root = FXMLLoader.load(getClass().getResource("/fxml/category_course_view.fxml"));
-        Stage stage = (Stage) lblWelcome.getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.setTitle("UCOP - Universal Commerce & Operations Platform");
-        stage.centerOnScreen();
-        stage.setMaximized(true); 
+        loadScene("/fxml/category_course_view.fxml");
     }
-    
+
+    // ✅ NEW: Promotion Management (SV5)
+    @FXML
+    private void openPromotionManagement() throws Exception {
+        loadScene("/fxml/promotion-management.fxml");
+    }
+
+    // ✅ NEW: Report/Dashboard (SV5) - nếu m tạo report-dashboard.fxml
+    @FXML
+    private void openReportDashboard() throws Exception {
+        loadScene("/fxml/report-dashboard.fxml");
+    }
+
     @FXML
     private void logout() throws Exception {
         CurrentUser.clear();
@@ -56,5 +65,6 @@ public class AdminDashboardController {
         stage.setScene(new Scene(root));
         stage.setTitle("UCOP - Universal Commerce & Operations Platform");
         stage.centerOnScreen();
+        stage.setMaximized(true);
     }
 }

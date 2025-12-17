@@ -5,9 +5,11 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "enrollments")
@@ -17,7 +19,8 @@ public class Enrollment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "enrollment_code", unique = true, length = 30)
+    // ✅ bắt buộc có code, không được null vì UNIQUE
+    @Column(name = "enrollment_code", unique = true, nullable = false, length = 30)
     private String enrollmentCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,12 +69,22 @@ public class Enrollment {
 
     public Enrollment() {}
 
-    // ================= LIFECYCLE =================
+    // ✅ generate code chắc chắn không null + <= 30 ký tự
+    private static String genCode() {
+        String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss"));
+        String rnd = UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
+        return "ENR" + ts + rnd; // <= 30
+    }
+
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         if (createdAt == null) createdAt = now;
         if (updatedAt == null) updatedAt = now;
+
+        if (enrollmentCode == null || enrollmentCode.isBlank()) {
+            enrollmentCode = genCode();
+        }
 
         normalizeMoney();
         ensureBidirectionalLinks();
@@ -81,6 +94,10 @@ public class Enrollment {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+
+        if (enrollmentCode == null || enrollmentCode.isBlank()) {
+            enrollmentCode = genCode();
+        }
 
         normalizeMoney();
         ensureBidirectionalLinks();
@@ -98,12 +115,22 @@ public class Enrollment {
     }
 
     private void ensureBidirectionalLinks() {
-        if (items != null) for (EnrollmentItem it : items) if (it != null) it.setEnrollment(this);
-        if (appointments != null) for (Appointment ap : appointments) if (ap != null) ap.setEnrollment(this);
-        // ❌ bỏ payments vì Payment đã link theo Order
+        if (items != null) {
+            for (EnrollmentItem it : items) {
+                if (it != null) it.setEnrollment(this);
+            }
+        }
+        if (appointments != null) {
+            for (Appointment ap : appointments) {
+                if (ap != null) ap.setEnrollment(this);
+            }
+        }
     }
 
-    // ================= BUSINESS =================
+    /**
+     * totalAmount = subtotal - discount + tax + ship (không âm)
+     * subtotal nếu bạn muốn tự set từ ngoài thì setSubtotal(...) trước, sau đó gọi recalculateTotals()
+     */
     public void recalculateTotals() {
         BigDecimal sub = BigDecimal.ZERO;
 
@@ -118,6 +145,7 @@ public class Enrollment {
                     BigDecimal unit = it.getUnitPrice() == null ? BigDecimal.ZERO : it.getUnitPrice();
                     Integer qty = it.getQuantity() == null ? 0 : it.getQuantity();
                     BigDecimal itemDiscount = it.getDiscountItemDiscount() == null ? BigDecimal.ZERO : it.getDiscountItemDiscount();
+
                     BigDecimal line = unit.multiply(BigDecimal.valueOf(qty)).subtract(itemDiscount);
                     if (line.signum() < 0) line = BigDecimal.ZERO;
                     sub = sub.add(line);
@@ -125,7 +153,12 @@ public class Enrollment {
             }
         }
 
-        subtotal = sub;
+        // nếu items có thì subtotal sẽ theo items; nếu không có items thì giữ subtotal hiện tại
+        if (items != null && !items.isEmpty()) {
+            subtotal = sub;
+        } else if (subtotal == null) {
+            subtotal = BigDecimal.ZERO;
+        }
 
         BigDecimal discount = discountAmount == null ? BigDecimal.ZERO : discountAmount;
         BigDecimal tax = taxAmount == null ? BigDecimal.ZERO : taxAmount;
@@ -138,43 +171,36 @@ public class Enrollment {
         totalAmount = total;
     }
 
+    // ===== helper =====
     public BigDecimal getAmountDue() {
         BigDecimal total = totalAmount == null ? BigDecimal.ZERO : totalAmount;
-        BigDecimal paid = paidAmount == null ? BigDecimal.ZERO : paidAmount;
+        BigDecimal paid  = paidAmount == null ? BigDecimal.ZERO : paidAmount;
         BigDecimal due = total.subtract(paid);
         return due.signum() < 0 ? BigDecimal.ZERO : due;
     }
 
-    // ================= HELPER 2 CHIỀU =================
     public void addItem(EnrollmentItem item) {
         if (item == null) return;
+        if (items == null) items = new HashSet<>();
         items.add(item);
         item.setEnrollment(this);
-        recalculateTotals();
     }
 
     public void removeItem(EnrollmentItem item) {
-        if (item == null) return;
+        if (item == null || items == null) return;
         items.remove(item);
         item.setEnrollment(null);
-        recalculateTotals();
     }
 
     public void addAppointment(Appointment ap) {
         if (ap == null) return;
+        if (appointments == null) appointments = new HashSet<>();
         appointments.add(ap);
         ap.setEnrollment(this);
     }
 
-    public void removeAppointment(Appointment ap) {
-        if (ap == null) return;
-        appointments.remove(ap);
-        ap.setEnrollment(null);
-    }
-
-    // ================= GETTER / SETTER =================
+    // ===== getters/setters =====
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public String getEnrollmentCode() { return enrollmentCode; }
     public void setEnrollmentCode(String enrollmentCode) { this.enrollmentCode = enrollmentCode; }
@@ -183,10 +209,9 @@ public class Enrollment {
     public void setStudent(Account student) { this.student = student; }
 
     public EnrollmentStatus getStatus() { return status; }
-    public void setStatus(EnrollmentStatus status) {
-        this.status = (status == null) ? EnrollmentStatus.CART : status;
-    }
+    public void setStatus(EnrollmentStatus status) { this.status = status; }
 
+    // ✅ để code cũ gọi setStatus("CART") / setStatus("PENDING") vẫn compile
     public void setStatus(String status) {
         if (status == null || status.isBlank()) {
             this.status = EnrollmentStatus.CART;
@@ -194,28 +219,29 @@ public class Enrollment {
         }
         try {
             this.status = EnrollmentStatus.valueOf(status.trim().toUpperCase());
-        } catch (IllegalArgumentException ex) {
+        } catch (Exception e) {
+            // nếu string lạ thì giữ nguyên hoặc về CART
             this.status = EnrollmentStatus.CART;
         }
     }
 
     public BigDecimal getSubtotal() { return subtotal; }
-    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal == null ? BigDecimal.ZERO : subtotal; }
+    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
 
     public BigDecimal getDiscountAmount() { return discountAmount; }
-    public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount == null ? BigDecimal.ZERO : discountAmount; }
+    public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount; }
 
     public BigDecimal getTaxAmount() { return taxAmount; }
-    public void setTaxAmount(BigDecimal taxAmount) { this.taxAmount = taxAmount == null ? BigDecimal.ZERO : taxAmount; }
+    public void setTaxAmount(BigDecimal taxAmount) { this.taxAmount = taxAmount; }
 
     public BigDecimal getShippingFee() { return shippingFee; }
-    public void setShippingFee(BigDecimal shippingFee) { this.shippingFee = shippingFee == null ? BigDecimal.ZERO : shippingFee; }
+    public void setShippingFee(BigDecimal shippingFee) { this.shippingFee = shippingFee; }
 
     public BigDecimal getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount == null ? BigDecimal.ZERO : totalAmount; }
+    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
 
     public BigDecimal getPaidAmount() { return paidAmount; }
-    public void setPaidAmount(BigDecimal paidAmount) { this.paidAmount = paidAmount == null ? BigDecimal.ZERO : paidAmount; }
+    public void setPaidAmount(BigDecimal paidAmount) { this.paidAmount = paidAmount; }
 
     public Promotion getPromotion() { return promotion; }
     public void setPromotion(Promotion promotion) { this.promotion = promotion; }
@@ -230,7 +256,6 @@ public class Enrollment {
     public void setItems(Set<EnrollmentItem> items) {
         this.items = (items == null) ? new HashSet<>() : items;
         ensureBidirectionalLinks();
-        recalculateTotals();
     }
 
     public Set<Appointment> getAppointments() { return appointments; }
@@ -249,6 +274,6 @@ public class Enrollment {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return 31;
     }
 }

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefWidth="1200.0" prefHeight="750.0"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ucop.edu.controller.ReportDashboardController">
+
+    <top>
+        <VBox spacing="10.0">
+            <padding>
+                <Insets top="15" right="15" bottom="10" left="15"/>
+            </padding>
+
+            <Label text="BÁO CÁO DOANH THU" style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Label text="From:"/>
+                <DatePicker fx:id="fromPicker"/>
+
+                <Label text="To:"/>
+                <DatePicker fx:id="toPicker"/>
+
+                <Button text="Tải lại" onAction="#reload"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="Xuất Excel" onAction="#exportExcel"/>
+                <Button text="Xuất PDF" onAction="#exportPdf"/>
+                <Button text="Quay lại" onAction="#backToDashboard"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="12.0">
+            <padding>
+                <Insets top="5" right="15" bottom="10" left="15"/>
+            </padding>
+
+            <HBox spacing="20.0">
+                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                    <Label text="Doanh thu theo ngày" style="-fx-font-weight: bold;"/>
+                    <LineChart fx:id="revenueLineChart" prefHeight="260.0">
+                        <xAxis>
+                            <CategoryAxis />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis />
+                        </yAxis>
+                    </LineChart>
+                </VBox>
+
+                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                    <Label text="Doanh thu theo phương thức thanh toán" style="-fx-font-weight: bold;"/>
+                    <BarChart fx:id="paymentMethodBarChart" prefHeight="260.0">
+                        <xAxis>
+                            <CategoryAxis />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis />
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+            </HBox>
+
+            <Label text="Top khóa học" style="-fx-font-weight: bold;"/>
+
+            <TableView fx:id="topTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colCourse" text="Course" prefWidth="380.0"/>
+                    <TableColumn fx:id="colCount" text="Enroll" prefWidth="120.0"/>
+                    <TableColumn fx:id="colRevenue" text="Revenue" prefWidth="200.0"/>
+                </columns>
+            </TableView>
+
+            <Label fx:id="lblTotalRefund" text="Total Refund: 0 VND" style="-fx-text-fill: #cc0000; -fx-font-weight: bold;"/>
+        </VBox>
+    </center>
+
+</BorderPane>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ucop.edu.controller.AdminCatalogController">
+    <children>
+        <TabPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <tabs>
+                <Tab text="Danh mục (Category)">
+                    <content>
+                        <VBox spacing="10">
+                            <TreeView fx:id="categoryTree" prefHeight="600.0" />
+                            <HBox spacing="10">
+                                <Button text="Thêm mới" onAction="#openAddCategory" />
+                                <Button text="Sửa" onAction="#openEditCategory" />
+                                <Button text="Xóa" onAction="#deleteCategory" />
+                                <Button text="Import CSV" onAction="#importCategoryCSV" />
+                                <Button text="Export CSV" onAction="#exportCategoryCSV" />
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Khóa học (Course)">
+                    <content>
+                        <VBox spacing="10">
+                            <TableView fx:id="courseTable">
+                                <columns>
+                                    <TableColumn text="ID" fx:id="colCourseId" />
+                                    <TableColumn text="Mã khóa" fx:id="colCourseCode" />
+                                    <TableColumn text="Tên" fx:id="colCourseName" />
+                                    <TableColumn text="Học phí" fx:id="colTuitionFee" />
+                                    <TableColumn text="Thời lượng (giờ)" fx:id="colDuration" />
+                                    <TableColumn text="Chỗ tối đa" fx:id="colMaxSeats" />
+                                    <TableColumn text="Chỗ còn lại" fx:id="colAvailableSeats" />
+                                    <TableColumn text="Trạng thái" fx:id="colStatus" />
+                                    <TableColumn text="Hành động" fx:id="colCourseAction" />
+                                </columns>
+                            </TableView>
+                            <HBox spacing="10">
+                                <Button text="Thêm mới" onAction="#openAddCourse" />
+                                <Button text="Refresh" onAction="#refreshCourses" />
+                                <Button text="Import CSV" onAction="#importCourseCSV" />
+                                <Button text="Export CSV" onAction="#exportCourseCSV" />
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Cảnh báo hết chỗ (Low Seats)">
+                    <content>
+                        <TableView fx:id="lowSeatTable">
+                            <columns>
+                                <TableColumn text="ID" fx:id="colLowId" />
+                                <TableColumn text="Mã khóa" fx:id="colLowCode" />
+                                <TableColumn text="Tên" fx:id="colLowName" />
+                                <TableColumn text="Chỗ còn lại" fx:id="colLowAvailable" />
+                            </columns>
+                        </TableView>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+</AnchorPane>

@@ -21,8 +21,7 @@ public class Order {
     @JoinColumn(name = "student_id", nullable = false)
     private Account student;
 
-    // ✅ LINK sang Enrollment để hoàn tiền dùng giống Payment/Đơn hàng
-    // DB cần có cột: orders.enrollment_id (FK -> enrollments.id)
+    // ✅ LINK sang Enrollment
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enrollment_id")
     private Enrollment enrollment;
@@ -31,7 +30,7 @@ public class Order {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    // ===== TOTAL =====
+    // ===== TOTAL (có thể đã áp voucher) =====
     @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -48,6 +47,19 @@ public class Order {
     )
     private Set<OrderItem> items = new HashSet<>();
 
+    // =========================================================
+    // ✅ UI / Controller needs (không lưu DB)
+    // để StudentPaymentController compile được (getPromotion, getSubtotalAmount...)
+    // =========================================================
+    @Transient
+    private Promotion promotion;
+
+    @Transient
+    private BigDecimal subtotalAmount = BigDecimal.ZERO;
+
+    @Transient
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+
     public Order() {}
 
     // ================= LIFECYCLE =================
@@ -57,11 +69,14 @@ public class Order {
         if (totalAmount == null) totalAmount = BigDecimal.ZERO;
         if (status == null || status.isBlank()) status = "PENDING";
 
+        // đảm bảo item trỏ ngược về order
         if (items != null) {
             for (OrderItem it : items) {
                 if (it != null) it.setOrder(this);
             }
         }
+
+        // recalc nhưng KHÔNG phá totalAmount nếu totalAmount đã được set khác sum-items (voucher)
         recalculateTotal();
     }
 
@@ -69,6 +84,14 @@ public class Order {
     protected void preUpdate() {
         if (totalAmount == null) totalAmount = BigDecimal.ZERO;
         if (status == null || status.isBlank()) status = "PENDING";
+
+        // đảm bảo item trỏ ngược về order
+        if (items != null) {
+            for (OrderItem it : items) {
+                if (it != null) it.setOrder(this);
+            }
+        }
+
         recalculateTotal();
     }
 
@@ -97,8 +120,14 @@ public class Order {
         recalculateTotal();
     }
 
+    /**
+     * ✅ Tính tổng theo item.
+     * - Nếu totalAmount đang null/0 hoặc đang đúng bằng sum-items => set totalAmount = sum-items
+     * - Nếu totalAmount đã được set khác sum-items (ví dụ đã trừ voucher) => GIỮ NGUYÊN totalAmount
+     */
     public void recalculateTotal() {
         BigDecimal sum = BigDecimal.ZERO;
+
         if (items != null) {
             for (OrderItem it : items) {
                 if (it == null) continue;
@@ -106,10 +135,27 @@ public class Order {
                 BigDecimal price = it.getUnitPrice() == null ? BigDecimal.ZERO : it.getUnitPrice();
                 Integer qty = it.getQuantity() == null ? 0 : it.getQuantity();
 
-                sum = sum.add(price.multiply(BigDecimal.valueOf(qty)));
+                if (qty > 0) {
+                    sum = sum.add(price.multiply(BigDecimal.valueOf(qty)));
+                }
             }
         }
-        totalAmount = sum;
+
+        if (sum.signum() < 0) sum = BigDecimal.ZERO;
+
+        // nếu totalAmount chưa set/đang 0 => set theo sum
+        if (totalAmount == null || totalAmount.signum() == 0) {
+            totalAmount = sum;
+            return;
+        }
+
+        // nếu totalAmount đang đúng bằng sum => vẫn set (cho chắc)
+        if (totalAmount.compareTo(sum) == 0) {
+            totalAmount = sum;
+            return;
+        }
+
+        // ✅ còn lại: totalAmount đã khác sum (thường là do voucher/discount) => giữ nguyên
     }
 
     // ================= GETTER / SETTER =================
@@ -142,6 +188,20 @@ public class Order {
             if (it != null) it.setOrder(this);
         }
         recalculateTotal();
+    }
+
+    // ======= UI-only fields getter/setter =======
+    public Promotion getPromotion() { return promotion; }
+    public void setPromotion(Promotion promotion) { this.promotion = promotion; }
+
+    public BigDecimal getSubtotalAmount() { return subtotalAmount; }
+    public void setSubtotalAmount(BigDecimal subtotalAmount) {
+        this.subtotalAmount = (subtotalAmount == null) ? BigDecimal.ZERO : subtotalAmount;
+    }
+
+    public BigDecimal getDiscountAmount() { return discountAmount; }
+    public void setDiscountAmount(BigDecimal discountAmount) {
+        this.discountAmount = (discountAmount == null) ? BigDecimal.ZERO : discountAmount;
     }
 
     // ================= equals/hashCode =================

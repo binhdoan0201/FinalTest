@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -7,8 +6,7 @@
       fx:controller="com.ucop.edu.controller.AdminDashboardController"
       spacing="30" alignment="CENTER" style="-fx-background-color: #f8f9fa; -fx-padding: 40;">
 
-    <!-- ĐÃ THÊM fx:id="lblWelcome" -->
-    <Label fx:id="lblWelcome" text="CHÀO MỪNG ADMIN!" 
+    <Label fx:id="lblWelcome" text="CHÀO MỪNG ADMIN!"
            style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
 
     <Label text="UCOP - Universal Commerce &amp; Operations Platform"
@@ -16,21 +14,33 @@
 
     <VBox spacing="20" alignment="CENTER">
         <HBox spacing="30" alignment="CENTER">
+
             <Button text="Quản lý người dùng"
                     onAction="#openUserManagement"
                     prefWidth="300" prefHeight="100"
                     style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
 
             <Button text="Quản lý danh mục"
-            		onAction="#openCourseManagement"
+                    onAction="#openCourseManagement"
                     prefWidth="300" prefHeight="100"
                     style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
-            
+
+            <!-- ✅ NEW: Promotion Management (SV5) -->
+            <Button text="Quản lý khuyến mãi"
+                    onAction="#openPromotionManagement"
+                    prefWidth="300" prefHeight="100"
+                    style="-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+        </HBox>
+
+        <HBox spacing="30" alignment="CENTER">
+
+            <!-- ✅ FIX: gắn onAction cho báo cáo -->
             <Button text="Báo cáo doanh thu"
+                    onAction="#openReportDashboard"
                     prefWidth="300" prefHeight="100"
                     style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
-                    
-            
+
         </HBox>
     </VBox>
 

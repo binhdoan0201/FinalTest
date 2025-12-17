@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ucop.edu.controller.PromotionManagementController">
+
+    <top>
+        <HBox spacing="8" style="-fx-padding: 10;">
+            <Button text="⬅ Quay lại Dashboard" onAction="#backToDashboard"
+                    style="-fx-background-color:#64748b; -fx-text-fill:white; -fx-font-weight:bold;"/>
+
+            <Label text="Quản lý khuyến mãi"
+                   style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+
+            <Pane HBox.hgrow="ALWAYS"/>
+
+            <TextField fx:id="keywordField" promptText="Tìm theo mã / tên..." prefWidth="240"/>
+            <Button text="Tìm" onAction="#onSearch"/>
+            <Button text="Tải lại" onAction="#reload"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TableView fx:id="table" prefHeight="500">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+                <TableColumn fx:id="colCode" text="Mã" prefWidth="120"/>
+                <TableColumn fx:id="colName" text="Tên khuyến mãi" prefWidth="180"/>
+                <TableColumn fx:id="colType" text="Loại" prefWidth="100"/>
+                <TableColumn fx:id="colValue" text="Giá trị" prefWidth="100"/>
+                <TableColumn fx:id="colRemaining" text="Còn lại" prefWidth="90"/>
+                <TableColumn fx:id="colFrom" text="Từ ngày" prefWidth="110"/>
+                <TableColumn fx:id="colTo" text="Đến ngày" prefWidth="110"/>
+                <TableColumn fx:id="colScope" text="Phạm vi áp dụng" prefWidth="220"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <HBox spacing="8" style="-fx-padding: 10;">
+            <Button text="Thêm mới" onAction="#onNew"/>
+            <Button text="Chỉnh sửa" onAction="#onEdit"/>
+            <Button text="Hết hạn ngay" onAction="#onExpireNow"/>
+            <Button text="Xóa" onAction="#onDelete"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

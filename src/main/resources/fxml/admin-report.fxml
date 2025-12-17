@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ucop.edu.controller.AdminReportController"
+      spacing="20" style="-fx-padding: 30; -fx-background-color: #f8f9fa;">
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Button text="Quay lại Dashboard" onAction="#backToDashboard"
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        <Label text="BÁO CÁO TỔNG HỢP" 
+               style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+    </HBox>
+
+    <!-- Thống kê số liệu -->
+    <GridPane hgap="30" vgap="20">
+        <Label text="Tổng người dùng:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 18px;"/>
+        <Label fx:id="lblTotalUsers" text="0" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3498db;"/>
+
+        <Label text="Tổng đơn ghi danh:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 18px;"/>
+        <Label fx:id="lblTotalEnrollments" text="0" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+
+        <Label text="Tổng doanh thu:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 18px;"/>
+        <Label fx:id="lblTotalRevenue" text="0 VNĐ" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #e67e22;"/>
+    </GridPane>
+
+    <!-- Biểu đồ doanh thu theo tháng -->
+    <Label text="Doanh thu theo tháng (VNĐ)" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <BarChart fx:id="barChartRevenue" prefWidth="1200" prefHeight="500" title="Doanh thu các tháng gần đây">
+        <xAxis>
+            <CategoryAxis label="Tháng"/>
+        </xAxis>
+        <yAxis>
+            <NumberAxis label="Doanh thu (VNĐ)" />
+        </yAxis>
+    </BarChart>
+
+    <!-- Top 5 khóa học -->
+    <Label text="Top 5 khóa học ghi danh nhiều nhất" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <TableView fx:id="tableTopCourses" prefHeight="300">
+        <columns>
+            <TableColumn text="STT" prefWidth="80"/>
+            <TableColumn text="Tên khóa học" prefWidth="400"/>
+            <TableColumn text="Số lượng ghi danh" prefWidth="200"/>
+        </columns>
+    </TableView>
+</VBox>
