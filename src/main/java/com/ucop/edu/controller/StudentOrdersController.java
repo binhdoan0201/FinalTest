@@ -33,6 +33,7 @@ public class StudentOrdersController {
     @FXML private TableColumn<Order, Object> colCreated;
     @FXML private TableColumn<Order, BigDecimal> colTotal;
     @FXML private TableColumn<Order, String> colStatus;
+    @FXML private TableColumn<Order, Void> colRefund;
 
     private final ObservableList<Order> data = FXCollections.observableArrayList();
     private final NumberFormat vnd = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
@@ -45,7 +46,7 @@ public class StudentOrdersController {
         colCreated.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-
+        
         // Format ngày tạo + căn giữa
         colCreated.setCellFactory(col -> new TableCell<>() {
             @Override
@@ -73,7 +74,7 @@ public class StudentOrdersController {
                 setAlignment(Pos.CENTER_RIGHT);
             }
         });
-
+        setupRefundColumn();
         // Canh giữa các cột còn lại
         colOrderId.setStyle("-fx-alignment: CENTER;");
         colStatus.setStyle("-fx-alignment: CENTER;");
@@ -92,6 +93,7 @@ public class StudentOrdersController {
         colCreated.prefWidthProperty().bind(w.multiply(0.38)); // 38%
         colTotal.prefWidthProperty().bind(w.multiply(0.28));   // 28%
         colStatus.prefWidthProperty().bind(w.multiply(0.22));  // 22%
+        colRefund.prefWidthProperty().bind(w.multiply(0.18));
     }
 
     @FXML
@@ -283,5 +285,100 @@ public class StudentOrdersController {
         a.setContentText(msg);
         a.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         a.showAndWait();
+    }
+    
+    private void setupRefundColumn() {
+        colRefund.setCellFactory(col -> new TableCell<>() {
+
+            private final Button btn = new Button("Refund");
+
+            {
+                btn.setStyle("-fx-background-color:#ef4444; -fx-text-fill:white; "
+                        + "-fx-background-radius:10; -fx-padding:6 12; -fx-font-weight:800; "
+                        + "-fx-cursor: hand;");
+                btn.setOnAction(e -> {
+                    Order order = getTableView().getItems().get(getIndex());
+                    requestRefund(order);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty) {
+                    setGraphic(null);
+                    return;
+                }
+
+                Order o = getTableView().getItems().get(getIndex());
+
+                // ✅ chỉ hiện nút khi PAID
+                boolean isPaid = (o != null && o.getStatus() != null
+                        && "PAID".equalsIgnoreCase(o.getStatus()));
+
+                setGraphic(isPaid ? btn : null);
+            }
+        });
+
+        // canh giữa cột nút (đẹp hơn)
+        colRefund.setStyle("-fx-alignment: CENTER;");
+    }
+
+    private void requestRefund(Order selected) {
+        if (selected == null) return;
+
+        // chỉ cho refund khi PAID (double-check)
+        if (selected.getStatus() == null || !"PAID".equalsIgnoreCase(selected.getStatus())) {
+            alert(Alert.AlertType.WARNING, "Không hợp lệ", "Chỉ refund đơn đang PAID.");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Xác nhận refund");
+        confirm.setHeaderText(null);
+        confirm.setContentText("Gửi yêu cầu refund Order #" + selected.getId()
+                + "?\nTrạng thái sẽ chuyển: PAID → REFUND_PENDING");
+
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
+
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            var tx = session.beginTransaction();
+
+            Long sid = CurrentUser.getCurrentAccount().getId();
+
+            Order o = session.get(Order.class, selected.getId());
+            if (o == null) {
+                tx.rollback();
+                alert(Alert.AlertType.ERROR, "Lỗi", "Không tìm thấy đơn hàng.");
+                return;
+            }
+
+            // đảm bảo là đơn của chính student
+            if (o.getStudent() == null || o.getStudent().getId() == null || !o.getStudent().getId().equals(sid)) {
+                tx.rollback();
+                alert(Alert.AlertType.ERROR, "Lỗi", "Bạn không có quyền refund đơn này.");
+                return;
+            }
+
+            // tránh bấm 2 lần / đổi trạng thái bởi nơi khác
+            if (o.getStatus() == null || !"PAID".equalsIgnoreCase(o.getStatus())) {
+                tx.rollback();
+                alert(Alert.AlertType.WARNING, "Không hợp lệ", "Đơn không còn ở trạng thái PAID.");
+                return;
+            }
+
+            o.setStatus("REFUND_PENDING");
+            session.merge(o);
+
+            tx.commit();
+
+            alert(Alert.AlertType.INFORMATION, "Thành công", "✅ Đã gửi yêu cầu refund (REFUND_PENDING).");
+            reload();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            alert(Alert.AlertType.ERROR, "Lỗi", "Refund thất bại: " + e.getMessage());
+        }
     }
 }

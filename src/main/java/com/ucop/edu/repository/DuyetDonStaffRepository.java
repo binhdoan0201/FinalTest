@@ -82,7 +82,7 @@ public class DuyetDonStaffRepository {
                             "update Order o set o.status = :newStatus where o.status = :oldStatus"
                     )
                     .setParameter("newStatus", "REFUND")
-                    .setParameter("oldStatus", "PAID")
+                    .setParameter("oldStatus", "REFUND_PENDING")
                     .executeUpdate();
 
             tx.commit();
@@ -112,8 +112,8 @@ public class DuyetDonStaffRepository {
 
             if (o == null) return false;
 
-            if (!"PAID".equalsIgnoreCase(o.getStatus())) {
-                throw new RuntimeException("Chỉ refund khi Order đang PAID!");
+            if (!"REFUND_PENDING".equalsIgnoreCase(o.getStatus())) {
+                throw new RuntimeException("Chỉ refund khi Order đang REFUND_PENDING!");
             }
 
             Long studentId = (o.getStudent() == null) ? null : o.getStudent().getId();
@@ -166,7 +166,7 @@ public class DuyetDonStaffRepository {
                             "order by o.createdAt desc",
                             Order.class
                     )
-                    .setParameter("st", "PAID")
+                    .setParameter("st", "REFUND_PENDING")
                     .getResultList();
 
             int updated = 0;

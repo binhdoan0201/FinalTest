@@ -21,7 +21,7 @@ public class DuyetDonStaffService {
     }
 
     public List<Order> getPaidOrders() {
-        return repo.findByStatusWithStudent("PAID");
+        return repo.findByStatusWithStudent("REFUND_PENDING");
     }
     
     

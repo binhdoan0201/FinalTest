@@ -52,6 +52,7 @@
                 <TableColumn fx:id="colCreated" text="Ngày tạo" prefWidth="240"/>
                 <TableColumn fx:id="colTotal" text="Tổng tiền" prefWidth="180"/>
                 <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="140"/>
+                <TableColumn fx:id="colRefund" text="Refund" prefWidth="140"/>
             </columns>
         </TableView>
     </VBox>

@@ -38,6 +38,13 @@
                            -fx-background-radius: 10;
                            -fx-padding: 8 14;
                            -fx-cursor: hand;"/>
+                           <Button text="Logout" onAction="#handleLogout"
+        style="-fx-background-color: #0f172a;
+               -fx-text-fill: white;
+               -fx-font-weight: 800;
+               -fx-background-radius: 10;
+               -fx-padding: 8 14;
+               -fx-cursor: hand;"/>
         </HBox>
     </top>
 
@@ -56,7 +63,7 @@
                               -fx-font-weight: 800;
                               -fx-font-size: 13px;"/>
 
-                <TableView fx:id="tblOrders" prefHeight="600"
+                <TableView fx:id="tblOrders" VBox.vgrow="ALWAYS"
                            style="-fx-background-color: transparent;
                                   -fx-background-radius: 12;
                                   -fx-border-color: #e5e7eb;

@@ -24,4 +24,8 @@ public class CurrentUser {
     public static String getRole() {
         return currentAccount != null ? currentAccount.getRole() : null;
     }
+    
+    public static void logout() {
+        setCurrentAccount(null); // hoặc currentAccount = null; tùy code bạn
+    }
 }

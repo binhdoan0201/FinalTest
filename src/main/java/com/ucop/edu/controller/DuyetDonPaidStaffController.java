@@ -2,11 +2,17 @@ package com.ucop.edu.controller;
 
 import com.ucop.edu.entity.Order;
 import com.ucop.edu.service.impl.DuyetDonStaffService;
+import com.ucop.edu.util.CurrentUser;
+
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
@@ -88,7 +94,7 @@ public class DuyetDonPaidStaffController {
 
                 // chỉ cho duyệt khi còn PAID
                 boolean canApprove = order != null
-                        && "PAID".equalsIgnoreCase(order.getStatus());
+                        && "REFUND_PENDING".equalsIgnoreCase(order.getStatus());
 
                 btn.setDisable(!canApprove);
                 setGraphic(btn);
@@ -158,4 +164,32 @@ public class DuyetDonPaidStaffController {
             lblMsg.setText("❌ Duyệt tất cả thất bại: " + e.getMessage());
         }
     }
+    @FXML
+    private void handleLogout() {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Đăng xuất");
+        confirm.setHeaderText(null);
+        confirm.setContentText("Bạn chắc chắn muốn đăng xuất?");
+
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) return;
+
+        try {
+            // 1) Clear session user
+            CurrentUser.logout(); // nếu bạn chưa có method này thì xem mục (3)
+
+            // 2) Mở lại màn login
+            Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml")); // đổi đúng path login của bạn
+            Scene scene = new Scene(root);
+
+            Stage stage = (Stage) tblOrders.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle("Login");
+            stage.centerOnScreen();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblMsg.setText("❌ Logout lỗi: " + e.getMessage());
+        }
+    }
+
 }
