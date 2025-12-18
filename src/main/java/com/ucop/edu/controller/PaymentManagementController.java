@@ -5,6 +5,8 @@ import com.ucop.edu.entity.enums.*;
 import com.ucop.edu.repository.PaymentRepository;
 import com.ucop.edu.repository.RefundRepository;
 import com.ucop.edu.repository.WalletRepository;
+import com.ucop.edu.service.impl.PaymentService;
+import com.ucop.edu.util.CurrentUser;
 import com.ucop.edu.util.HibernateUtil;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -80,6 +82,8 @@ public class PaymentManagementController {
 	private ComboBox<PaymentStatus> cbPayStatus;
 	@FXML
 	private TextField txtTransactionId;
+	@FXML
+	private TextArea txtPaymentNote;
 
 	// FORM REFUND
 	@FXML
@@ -93,6 +97,7 @@ public class PaymentManagementController {
 	private final PaymentRepository paymentRepo = new PaymentRepository();
 	private final RefundRepository refundRepo = new RefundRepository();
 	private final WalletRepository walletRepo = new WalletRepository();
+	private final PaymentService paymentService = new PaymentService();
 
 	private final ObservableList<Payment> payments = FXCollections.observableArrayList();
 	private final ObservableList<Refund> refunds = FXCollections.observableArrayList();
@@ -108,7 +113,8 @@ public class PaymentManagementController {
 		cbMethod.setItems(FXCollections.observableArrayList(PaymentMethod.values()));
 		cbPayStatus.setItems(FXCollections.observableArrayList(PaymentStatus.values()));
 		cbMethod.setValue(PaymentMethod.WALLET);
-		cbPayStatus.setValue(PaymentStatus.PAID);
+		cbPayStatus.setValue(PaymentStatus.PENDING);
+		cbPayStatus.setDisable(true);
 
 		cbEnrollment.setConverter(new StringConverter<>() {
 			@Override
@@ -234,140 +240,73 @@ public class PaymentManagementController {
 			return;
 		}
 
+		if (status != PaymentStatus.PENDING) {
+			err("Chỉ được tạo Payment ở trạng thái PENDING (chờ duyệt).");
+			return;
+		}
+
 		String txId = (txtTransactionId.getText() == null || txtTransactionId.getText().trim().isEmpty())
 				? "TX-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase()
 				: txtTransactionId.getText().trim();
 
-		Transaction tx = null;
-		try (Session s = HibernateUtil.getSessionFactory().openSession()) {
-			tx = s.beginTransaction();
-
-			Order managedO = s.get(Order.class, o.getId());
-			if (managedO == null)
-				throw new IllegalStateException("Order không tồn tại");
-
-			// ✅ PAID + WALLET: trừ ví + log
-			if (status == PaymentStatus.PAID && method == PaymentMethod.WALLET) {
-				Long studentId = managedO.getStudent().getId();
-				Account student = s.get(Account.class, studentId);
-
-				Wallets w = walletRepo.getOrCreate(studentId, s);
-				BigDecimal bal = nz(w.getBalance());
-				if (bal.compareTo(amount) < 0)
-					throw new IllegalStateException("Ví không đủ. Hiện có " + bal + ", cần " + amount);
-
-				w.setBalance(bal.subtract(amount));
-				s.merge(w);
-
-				WalletTransaction wt = new WalletTransaction();
-				wt.setAccount(student);
-				wt.setWallet(w);
-				wt.setOrderId(managedO.getId()); // nếu entity bạn là orderId
-				wt.setType(WalletTxType.PAYMENT_DEBIT);
-				wt.setAmount(amount);
-				wt.setBalanceAfter(nz(w.getBalance()));
-				wt.setMessage("Admin tạo payment cho Order#" + managedO.getId());
-				wt.setCreatedAt(LocalDateTime.now());
-				s.persist(wt);
-			}
-
-			Payment p = new Payment();
-			p.setOrder(managedO);
-			p.setAmount(amount);
-			p.setPaymentMethod(method);
-			p.setStatus(status);
-			p.setTransactionId(txId);
-			if (status == PaymentStatus.PAID)
-				p.setPaidAt(LocalDateTime.now());
-			s.persist(p);
-
-			// ✅ cập nhật Order + Enrollment theo NET PAID
-			updateOrderAndEnrollmentByNetPaid(s, managedO);
-
-			tx.commit();
-
-			ok("✅ Tạo Payment thành công");
+		try {
+			paymentService.payOrder(o.getStudent().getId(), o.getId(), amount, method, txId);
+			ok("✅ Tạo Payment PENDING thành công, chờ duyệt");
 			loadOrders();
 			loadAll();
-
 		} catch (Exception ex) {
-			if (tx != null)
-				tx.rollback();
 			ex.printStackTrace();
 			err("Tạo Payment lỗi: " + ex.getMessage());
 		}
 	}
 
 	@FXML
-	private void handleMarkPaid() {
+	private void handleApprovePayment() {
 		Payment p = tblPayments.getSelectionModel().getSelectedItem();
 		if (p == null) {
 			err("Chọn 1 Payment");
 			return;
 		}
 
-		Transaction tx = null;
-		try (Session s = HibernateUtil.getSessionFactory().openSession()) {
-			tx = s.beginTransaction();
+		BigDecimal amountOverride = parseMoneySmart(txtAmount.getText());
+		if (amountOverride != null && amountOverride.signum() <= 0) {
+			err("Số tiền duyệt không hợp lệ");
+			return;
+		}
 
-			Payment mp = s.get(Payment.class, p.getId());
-			if (mp == null)
-				throw new IllegalStateException("Payment không tồn tại");
-
-			// ✅ FIX BUG: đã PAID thì rollback rồi return (không bỏ tx lơ lửng)
-			if (mp.getStatus() == PaymentStatus.PAID) {
-				if (tx != null)
-					tx.rollback();
-				info("ℹ Payment đã PAID");
-				return;
-			}
-
-			Order o = (mp.getOrder() == null) ? null : s.get(Order.class, mp.getOrder().getId());
-			if (o == null)
-				throw new IllegalStateException("Payment chưa gắn Order (order_id null)");
-
-			// ✅ WALLET: trừ ví + log
-			if (mp.getPaymentMethod() == PaymentMethod.WALLET) {
-				Long studentId = o.getStudent().getId();
-				Account student = s.get(Account.class, studentId);
-				BigDecimal amount = nz(mp.getAmount());
-
-				Wallets w = walletRepo.getOrCreate(studentId, s);
-				BigDecimal bal = nz(w.getBalance());
-				if (bal.compareTo(amount) < 0)
-					throw new IllegalStateException("Ví không đủ để mark paid. Hiện có " + bal + ", cần " + amount);
-
-				w.setBalance(bal.subtract(amount));
-				s.merge(w);
-
-				WalletTransaction wt = new WalletTransaction();
-				wt.setAccount(student);
-				wt.setWallet(w);
-				wt.setOrderId(o.getId());
-				wt.setType(WalletTxType.PAYMENT_DEBIT);
-				wt.setAmount(amount);
-				wt.setBalanceAfter(nz(w.getBalance()));
-				wt.setMessage("Admin mark PAID payment#" + mp.getId() + " Order#" + o.getId());
-				wt.setCreatedAt(LocalDateTime.now());
-				s.persist(wt);
-			}
-
-			mp.setStatus(PaymentStatus.PAID);
-			mp.setPaidAt(LocalDateTime.now());
-			s.merge(mp);
-
-			updateOrderAndEnrollmentByNetPaid(s, o);
-
-			tx.commit();
-			ok("✅ Đã Mark PAID");
+		try {
+			Account staff = CurrentUser.getCurrentAccount();
+			Long staffId = staff != null ? staff.getId() : null;
+			paymentService.approvePayment(p.getId(), staffId, amountOverride);
+			ok("✅ Đã duyệt payment#" + p.getId());
 			loadOrders();
 			loadAll();
-
 		} catch (Exception ex) {
-			if (tx != null)
-				tx.rollback();
 			ex.printStackTrace();
-			err("Mark PAID lỗi: " + ex.getMessage());
+			err("Duyệt payment lỗi: " + ex.getMessage());
+		}
+	}
+
+	@FXML
+	private void handleRejectPayment() {
+		Payment p = tblPayments.getSelectionModel().getSelectedItem();
+		if (p == null) {
+			err("Chọn 1 Payment");
+			return;
+		}
+
+		String note = txtPaymentNote.getText() == null ? "" : txtPaymentNote.getText().trim();
+
+		try {
+			Account staff = CurrentUser.getCurrentAccount();
+			Long staffId = staff != null ? staff.getId() : null;
+			paymentService.rejectPayment(p.getId(), staffId, note);
+			ok("✅ Đã từ chối payment#" + p.getId());
+			loadOrders();
+			loadAll();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			err("Từ chối payment lỗi: " + ex.getMessage());
 		}
 	}
 
@@ -536,6 +475,8 @@ public class PaymentManagementController {
 	private void handleClearForm() {
 		txtAmount.clear();
 		txtTransactionId.clear();
+		if (txtPaymentNote != null)
+			txtPaymentNote.clear();
 		txtRefundAmount.clear();
 		txtRefundReason.clear();
 		info("ℹ Đã làm mới form");

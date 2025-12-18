@@ -140,7 +140,7 @@ public class StudentPaymentController {
                     (txtTransactionId.getText() == null ? null : txtTransactionId.getText().trim())
             );
 
-            setOk("✅ Thanh toán thành công: " + vnd.format(amount) + " VNĐ");
+            setOk("✅ Đã tạo yêu cầu thanh toán (" + vnd.format(amount) + " VNĐ). Vui lòng chờ duyệt.");
             txtAmount.clear();
             txtTransactionId.clear();
 

@@ -47,53 +47,94 @@ public class PaymentService {
             if (amount == null || amount.signum() <= 0) amount = due; // để trống = trả hết
             if (amount.compareTo(due) > 0) throw new IllegalStateException("Số tiền vượt quá phần còn lại cần trả.");
 
-            Account student = s.get(Account.class, studentId);
-
             // =====================
-            // WALLET: trừ ví
-            // =====================
-            Wallets w = walletRepo.getOrCreate(studentId, s);
-            w.sub(amount); // nếu ví không đủ, hàm sub của bạn nên throw
-            s.merge(w);
-
-            // log wallet tx
-            WalletTransaction txw = new WalletTransaction();
-            txw.setAccount(student);
-            txw.setWallet(w);
-            txw.setOrderId(orderId);
-            txw.setType(WalletTxType.PAYMENT_DEBIT);
-            txw.setAmount(amount);
-            txw.setBalanceAfter(w.getBalance());
-            txw.setMessage("Thanh toán đơn #" + orderId);
-            txw.setCreatedAt(LocalDateTime.now());
-            s.persist(txw);
-
-            // =====================
-            // PAYMENT record
+            // PAYMENT record (pending, chờ duyệt)
             // =====================
             Payment p = new Payment();
             p.setOrder(order);
             p.setAmount(amount);
             p.setPaymentMethod(method);
-            p.setStatus(PaymentStatus.PAID);
+            p.setStatus(PaymentStatus.PENDING);
 
             String txId = (transactionIdOrNull == null || transactionIdOrNull.trim().isEmpty())
                     ? ("TX-" + UUID.randomUUID())
                     : transactionIdOrNull.trim();
             p.setTransactionId(txId);
-            p.setPaidAt(LocalDateTime.now());
             s.persist(p);
 
-            // =====================
-            // update order status
-            // =====================
+            // gắn trạng thái order để staff biết đang chờ thanh toán
+            order.setStatus("PENDING_PAYMENT");
+            s.merge(order);
+
+            tx.commit();
+            return p;
+
+        } catch (Exception e) {
+            try { if (tx != null && tx.isActive()) tx.rollback(); } catch (Exception ignore) {}
+            throw new RuntimeException("Thanh toán thất bại: " + e.getMessage(), e);
+        }
+    }
+
+    public Payment approvePayment(Long paymentId, Long staffId, BigDecimal amountOverride) {
+        Transaction tx = null;
+
+        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
+            tx = s.beginTransaction();
+
+            Payment payment = s.get(Payment.class, paymentId);
+            if (payment == null) throw new IllegalStateException("Không tìm thấy payment id=" + paymentId);
+
+            if (payment.getStatus() == PaymentStatus.PAID) throw new IllegalStateException("Payment đã ở trạng thái PAID.");
+            if (payment.getStatus() == PaymentStatus.FAILED || payment.getStatus() == PaymentStatus.CANCELED) {
+                throw new IllegalStateException("Payment đã bị từ chối.");
+            }
+
+            Order order = (payment.getOrder() == null) ? null : s.get(Order.class, payment.getOrder().getId());
+            if (order == null) throw new IllegalStateException("Payment chưa gắn Order.");
+
+            Account student = (order.getStudent() == null) ? null : s.get(Account.class, order.getStudent().getId());
+            if (student == null) throw new IllegalStateException("Order chưa gắn Student.");
+
+            BigDecimal total = nvl(order.getTotalAmount());
+            BigDecimal paid = nvl(paymentRepo.sumPaidByOrder(s, order.getId()));
+            BigDecimal due = total.subtract(paid);
+            if (due.signum() <= 0) throw new IllegalStateException("Đơn này đã thanh toán đủ.");
+
+            BigDecimal amountToPay = amountOverride;
+            if (amountToPay == null || amountToPay.signum() <= 0) amountToPay = nvl(payment.getAmount());
+            if (amountToPay.signum() <= 0) throw new IllegalStateException("Số tiền thanh toán không hợp lệ.");
+            if (amountToPay.compareTo(due) > 0) throw new IllegalStateException("Số tiền vượt quá phần còn lại cần trả.");
+
+            payment.setAmount(amountToPay);
+
+            if (payment.getPaymentMethod() == PaymentMethod.WALLET) {
+                Wallets w = walletRepo.getOrCreate(student.getId(), s);
+                w.sub(amountToPay);
+                s.merge(w);
+
+                WalletTransaction txw = new WalletTransaction();
+                txw.setAccount(student);
+                txw.setWallet(w);
+                txw.setOrderId(order.getId());
+                txw.setType(WalletTxType.PAYMENT_DEBIT);
+                txw.setAmount(amountToPay);
+                txw.setBalanceAfter(w.getBalance());
+                String msg = "Duyệt payment#" + paymentId + " cho Order#" + order.getId();
+                if (staffId != null) msg += " (staff#" + staffId + ")";
+                txw.setMessage(msg);
+                txw.setCreatedAt(LocalDateTime.now());
+                s.persist(txw);
+            }
+
+            payment.setStatus(PaymentStatus.PAID);
+            payment.setPaidAt(LocalDateTime.now());
+            s.merge(payment);
+
+            BigDecimal newPaid = paid.add(amountToPay);
             String oldStatus = order.getStatus();
-            BigDecimal newPaid = paid.add(amount);
 
             if (newPaid.compareTo(total) >= 0) {
                 order.setStatus("PAID");
-
-                // ✅ CHỈ TIÊU THỤ VOUCHER khi chuyển sang PAID
                 if (!"PAID".equalsIgnoreCase(oldStatus)) {
                     consumePromotionIfAny(s, order, student);
                 }
@@ -103,11 +144,46 @@ public class PaymentService {
             s.merge(order);
 
             tx.commit();
-            return p;
+            return payment;
 
         } catch (Exception e) {
             try { if (tx != null && tx.isActive()) tx.rollback(); } catch (Exception ignore) {}
-            throw new RuntimeException("Thanh toán thất bại: " + e.getMessage(), e);
+            throw new RuntimeException("Duyệt payment thất bại: " + e.getMessage(), e);
+        }
+    }
+
+    public Payment rejectPayment(Long paymentId, Long staffId, String note) {
+        Transaction tx = null;
+
+        try (Session s = HibernateUtil.getSessionFactory().openSession()) {
+            tx = s.beginTransaction();
+
+            Payment payment = s.get(Payment.class, paymentId);
+            if (payment == null) throw new IllegalStateException("Không tìm thấy payment id=" + paymentId);
+            if (payment.getStatus() == PaymentStatus.PAID) throw new IllegalStateException("Payment đã được thanh toán.");
+
+            payment.setStatus(PaymentStatus.FAILED);
+            payment.setPaidAt(null);
+
+            // ghép note vào transactionId để dễ truy vết mà không cần đổi schema
+            if (note != null && !note.trim().isEmpty()) {
+                String prefix = "[REJECT";
+                if (staffId != null) prefix += " staff#" + staffId;
+                prefix += "] ";
+                String txId = payment.getTransactionId();
+                if (txId == null || txId.isBlank()) txId = prefix + note.trim();
+                else txId = txId + " | " + prefix + note.trim();
+                payment.setTransactionId(txId);
+            }
+
+            s.merge(payment);
+
+            tx.commit();
+            return payment;
+
+        } catch (Exception e) {
+            try { if (tx != null && tx.isActive()) tx.rollback(); } catch (Exception ignore) {}
+            throw new RuntimeException("Từ chối payment thất bại: " + e.getMessage(), e);
         }
     }
 
