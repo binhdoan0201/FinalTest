@@ -7,18 +7,21 @@
             com.microsoft.sqlserver.jdbc.SQLServerDriver
         </property>
         
-		<!-- Hưng
+		<!-- Hưng-->
 		<property name="hibernate.connection.url">
   			jdbc:sqlserver://MSI\SQLEXPRESS:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true;instance=SQLEXPRESS
-        </property> -->
+        </property> 
+        <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.connection.password">123</property>
         
+        <!-- Bình 
         <property name="hibernate.connection.url">
             jdbc:sqlserver://DESKTOP-EDP0165:1433;databaseName=ucop_edu;encrypt=true;trustServerCertificate=true;instance=SQLEXPRESS
         </property>
         
         <property name="hibernate.connection.username">sa</property>
         <property name="hibernate.connection.password">123456</property>
-        
+        -->
         
         <!-- Dũng 
         <property name="hibernate.connection.url">

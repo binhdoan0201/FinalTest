@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.Pane?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="400.0" prefWidth="600.0"
-      xmlns="http://javafx.com/javafx/25"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.ucop.edu.controller.StaffDashboardController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="714.0" prefWidth="1060.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ucop.edu.controller.StaffDashboardController">
 
    <children>
-      <Label alignment="CENTER" layoutX="123.0" layoutY="25.0" prefHeight="71.0" prefWidth="354.0"
-             text="STAFF-DASHBOARD" />
-
-      <Button layoutX="50.0" layoutY="96.0" mnemonicParsing="false" prefHeight="61.0" prefWidth="200.0"
-              text="Duyệt yêu cầu hoàn tiền"
-              onAction="#openReturnRequests"/>
+      <Label alignment="CENTER" layoutX="353.0" layoutY="25.0" prefHeight="71.0" prefWidth="354.0" text="STAFF-DASHBOARD" />
+      <TabPane layoutY="117.0" prefHeight="598.0" prefWidth="1060.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Duyệt đơn">
+            <content>
+              <fx:include source="duyet_don_staff.fxml" />
+            </content>
+          </Tab>
+          <Tab text="Duyệt yêu cầu hoàn tiền">
+            <content>
+              <fx:include source="duyet_refund_staff.fxml" />
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
    </children>
 </Pane>

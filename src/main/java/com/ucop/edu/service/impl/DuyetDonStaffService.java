@@ -20,7 +20,21 @@ public class DuyetDonStaffService {
         }
     }
 
+    public List<Order> getPaidOrders() {
+        return repo.findByStatusWithStudent("PAID");
+    }
+    
+    
     public int approveAllPending() {
         return repo.updateAllPendingToSuccess();
+    }
+    
+    public void refundPaidOrder(Long orderId) {
+        boolean ok = repo.refundPaidOrderToWallet(orderId);
+        if (!ok) throw new RuntimeException("Không tìm thấy Order ID = " + orderId);
+    }
+
+    public int refundAllPaid() {
+        return repo.refundAllPaidToWallet();
     }
 }
