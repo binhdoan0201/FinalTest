@@ -158,6 +158,13 @@
                     <TextField fx:id="txtTransactionId" promptText="(tự sinh nếu để trống)"
                                GridPane.rowIndex="4" GridPane.columnIndex="1"
                                style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
+
+                    <Label text="Ghi chú (reject):" GridPane.rowIndex="5" GridPane.columnIndex="0"
+                           style="-fx-text-fill: #374151; -fx-font-weight: bold;"/>
+                    <TextArea fx:id="txtPaymentNote" promptText="Lý do từ chối (tuỳ chọn)"
+                              prefRowCount="2"
+                              GridPane.rowIndex="5" GridPane.columnIndex="1"
+                              style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e5e7eb;"/>
                 </GridPane>
 
                 <HBox spacing="10">
@@ -168,8 +175,15 @@
                                    -fx-background-radius: 10;
                                    -fx-padding: 9 14;
                                    -fx-cursor: hand;"/>
-                    <Button text="✅ Mark PAID" onAction="#handleMarkPaid"
+                    <Button text="✅ Approve" onAction="#handleApprovePayment"
                             style="-fx-background-color: #2563eb;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 10;
+                                   -fx-padding: 9 14;
+                                   -fx-cursor: hand;"/>
+                    <Button text="⛔ Reject" onAction="#handleRejectPayment"
+                            style="-fx-background-color: #ef4444;
                                    -fx-text-fill: white;
                                    -fx-font-weight: bold;
                                    -fx-background-radius: 10;
@@ -227,7 +241,7 @@
                                    -fx-cursor: hand;"/>
                 </HBox>
 
-                <Label text="💡 WALLET: Mark PAID sẽ trừ ví; Process Refund sẽ cộng lại ví."
+                <Label text="💡 WALLET: Approve sẽ trừ ví; Process Refund sẽ cộng lại ví."
                        wrapText="true"
                        style="-fx-text-fill: #6b7280;"/>
             </VBox>

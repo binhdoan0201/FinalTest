@@ -29,7 +29,7 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 30, nullable = false)
-    private PaymentStatus status = PaymentStatus.PAID;
+    private PaymentStatus status = PaymentStatus.PENDING;
 
     @Column(name = "transaction_id", length = 100)
     private String transactionId;
@@ -39,9 +39,9 @@ public class Payment {
 
     @PrePersist
     public void prePersist() {
-        if (paidAt == null) paidAt = LocalDateTime.now();
         if (amount == null) amount = BigDecimal.ZERO;
-        if (status == null) status = PaymentStatus.PAID;
+        if (status == null) status = PaymentStatus.PENDING;
+        if (status == PaymentStatus.PAID && paidAt == null) paidAt = LocalDateTime.now();
     }
 
     public Long getId() { return id; }
